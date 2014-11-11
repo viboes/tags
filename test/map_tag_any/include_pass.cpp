@@ -89,6 +89,8 @@ int main()
     map_tag_any mta3;
     tag_insert<t2>(mta3, std::string("a"));
     std::cout << "t2::" << tag_cast<t2>(mta3) << std::endl;
+    tag_insert<t1>(mta3, 3);
+    std::cout << "t1::" << tag_cast<t1>(mta3) << std::endl;
 
     tag_insert<t3>(mta, mta3);
     //std::cout << "t3::" << tag_cast<t1>(mta) << std::endl;
@@ -105,11 +107,16 @@ int main()
         [](t3, map_tag_any& m)
         {
           std::cout << "t3:" << std::endl;
-          tag_accept<void, t2>(m,
+          tag_accept<void, t1, t2>(m,
+              [](t1, int& i)
+              {
+                std::cout << "  t1:" << i << std::endl;
+              },
               [](t2, std::string& i)
               {
                 std::cout << "  t2:" << i << std::endl;
               }
+
           );
         }
     );

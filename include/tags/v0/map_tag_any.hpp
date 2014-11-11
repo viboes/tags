@@ -84,26 +84,26 @@ namespace tags {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
       if (res) return f(Tag{}, *res);
-      else return throw boost::bad_any_cast();
+      return R();
     }
 
     template <class R, class Tag, class ... Tags, class F, class ... Fs>
     R tag_accept(map_tag_any& x, types<Tag, Tags...>, F&& f, Fs&&... fs) {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
-      if (res) return f(Tag{}, *res);
-      else return tag_accept<R>(x, types<Tags...>(), std::forward<Fs>(fs)...);
+      if (res) f(Tag{}, *res);
+      return tag_accept<R>(x, types<Tags...>(), std::forward<Fs>(fs)...);
     }
 
     template <class R, class ... Tags, class ... Fs>
-    R tag_accept(boost::any& x, Fs&&... fs) {
+    R mtag_accept(boost::any& x, Fs&&... fs) {
       map_tag_any * res = boost::any_cast<map_tag_any>(&x);
       if (res) return tag_accept<R, Tags...>(*res, std::forward<Fs>(fs)...);
-      return throw boost::bad_any_cast();
+      return R();
     }
 
     template <class R, class ... Tags, class ... Fs>
-    R tag_accept(boost::any& x, types<Tags...>, Fs&&... fs) {
+    R mtag_accept(boost::any& x, types<Tags...>, Fs&&... fs) {
       map_tag_any * res = boost::any_cast<map_tag_any>(&x);
       if (res) return tag_accept<R>(*res, types<Tags...>(), std::forward<Fs>(fs)...);
       return throw boost::bad_any_cast();
