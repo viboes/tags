@@ -1,0 +1,61 @@
+
+############################################
+# Copyright Vicente J. Botet Escriba 2014.
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+############################################
+
+import testing ;  # Bring in rules for testing
+  
+if ! $(BOOST_ROOT)
+{
+    BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+}
+
+
+	
+project tags
+    : requirements
+      <include>. # .cpp files in expected/test.
+      <include>../include/ # tags .hpp files.
+      <include>$(BOOST_ROOT) # boost .hpp files.    
+
+      <link>static
+      <toolset>gcc:<cxxflags>-std=c++11
+      <toolset>gcc:<cxxflags>-Wno-unused-local-typedefs
+      <toolset>clang:<cxxflags>-std=c++11
+      <toolset>msvc:<asynch-exceptions>on # Needed for Boost.Test
+      <toolset>msvc:<warnings>all
+      <toolset>msvc:<define>_SCL_SECURE_NO_WARNINGS
+      <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE
+      <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE
+      <toolset>msvc:<define>_CRT_SECURE_NO_WARNINGS
+
+      # Warning suppression:
+      <toolset>msvc:<cxxflags>/wd4100 # unreferenced formal parameter.
+      <toolset>msvc:<cxxflags>/wd4456 # declaration hides previous declaration.
+      <toolset>msvc:<cxxflags>/wd4459 # declaration hides global declaration.
+
+      <toolset>msvc:<iterator_debugging>off
+      <toolset>intel-win:<iterator_debugging>off
+    ;
+
+test-suite ts_tag
+    : 
+      [ run tag/include_pass.cpp : : : : tag_include_p ]
+    ;
+
+test-suite ts_tagged
+    : 
+      [ run tagged/include_pass.cpp : : : : tagged_include_p ]
+    ;
+
+test-suite ts_tag_any
+    : 
+      [ run tag_any/include_pass.cpp : : : : tag_any_include_p ]
+    ;
+
+explicit fix ;
+test-suite fix
+    : 
+    ;
