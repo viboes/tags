@@ -9,6 +9,6 @@
 #ifndef BOOST_TAGS_TAGGED_HPP
 #define BOOST_TAGS_TAGGED_HPP
 
-#include <boost/tags/v0/tagged.hpp>
+#include <tags/v0/tagged.hpp>
 
 #endif // header

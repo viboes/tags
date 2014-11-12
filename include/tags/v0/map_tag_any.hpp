@@ -22,6 +22,17 @@
 namespace tags {
   TAGS_INLINE_NAMESPACE(v0) {
 
+    /// @c map_tag_any is a kind of map mapping types to any
+    /// This is simmilar to a tagged @c fusion::tuple, but having a variadic number of elements.
+    /// The operations on this type are
+    ///   * @c tag_insert
+    ///   * @c tag_cast
+    ///   * @c mtag_accept
+    ///
+    /// A tag has associated two informations
+    ///   * The type associated to a tag know at compile time.
+    ///   * A unique index that can be used in ordered containers
+
     struct map_tag_any {
       typedef std::map<std::type_index, boost::any> map_type;
       map_type data;
@@ -64,7 +75,7 @@ namespace tags {
 
     /////
     template <class R, class Tag, class F>
-    R tag_accept(map_tag_any& x, F&& f) {
+    R mtag_accept(map_tag_any& x, F&& f) {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
       if (res) return f(Tag{}, *res);
@@ -72,15 +83,16 @@ namespace tags {
     }
 
     template <class R, class Tag, class ... Tags, class F, class ... Fs>
-    R tag_accept(map_tag_any& x, F&& f, Fs&&... fs) {
+    R mtag_accept(map_tag_any& x, F&& f, Fs&&... fs) {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
       if (res) f(Tag{}, *res);
-      return tag_accept<R, Tags...>(x, std::forward<Fs>(fs)...);
+      return mtag_accept<R, Tags...>(x, std::forward<Fs>(fs)...);
     }
 
+    /////
     template <class R, class Tag, class F>
-    R tag_accept(map_tag_any& x, types<Tag>, F&& f) {
+    R mtag_accept(map_tag_any& x, types<Tag>, F&& f) {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
       if (res) return f(Tag{}, *res);
@@ -88,24 +100,26 @@ namespace tags {
     }
 
     template <class R, class Tag, class ... Tags, class F, class ... Fs>
-    R tag_accept(map_tag_any& x, types<Tag, Tags...>, F&& f, Fs&&... fs) {
+    R mtag_accept(map_tag_any& x, types<Tag, Tags...>, F&& f, Fs&&... fs) {
       typedef typename tag_type<Tag>::type T;
       T* res = tag_cast<Tag>(&x);
       if (res) f(Tag{}, *res);
-      return tag_accept<R>(x, types<Tags...>(), std::forward<Fs>(fs)...);
+      return mtag_accept<R>(x, types<Tags...>(), std::forward<Fs>(fs)...);
     }
 
+    /////
     template <class R, class ... Tags, class ... Fs>
     R mtag_accept(boost::any& x, Fs&&... fs) {
       map_tag_any * res = boost::any_cast<map_tag_any>(&x);
-      if (res) return tag_accept<R, Tags...>(*res, std::forward<Fs>(fs)...);
+      if (res) return mtag_accept<R, Tags...>(*res, std::forward<Fs>(fs)...);
       return R();
     }
 
+    /////
     template <class R, class ... Tags, class ... Fs>
     R mtag_accept(boost::any& x, types<Tags...>, Fs&&... fs) {
       map_tag_any * res = boost::any_cast<map_tag_any>(&x);
-      if (res) return tag_accept<R>(*res, types<Tags...>(), std::forward<Fs>(fs)...);
+      if (res) return mtag_accept<R>(*res, types<Tags...>(), std::forward<Fs>(fs)...);
       return throw boost::bad_any_cast();
     }
 
@@ -114,7 +128,7 @@ namespace tags {
     struct t1 {}
     map_tag_any ta = make_tag_any<t1>(1);
     ...
-    tag_accept<void, t1, t2>(ta,
+    mtag_accept<void, t1, t2>(ta,
         [](t1, int& i) {...},
         [](t2, string& i) {...}
     );
@@ -127,7 +141,7 @@ namespace tags {
     struct t1 {}
     map_tag_any ta = make_tag_any<t1>(1);
     ...
-    tag_accept<void, t1, t2>(ta,
+    mtag_accept<void, t1, t2>(ta,
         [](tagged<int,    t1> const& i) {...},
         [](tagged<string, t2> const& s) {...}
     );
@@ -139,7 +153,7 @@ namespace tags {
     struct t1 {}
     any a = make_tag_any<t1>(1);
     ...
-    tag_accept<void, t1>(a,
+    mtag_accept<void, t1>(a,
         [](t1 , int& i) {...}
     );
 #endif
@@ -153,7 +167,7 @@ namespace tags {
     map_tag_any ta = make_tag_any<t1>(1);
     map_tag_any tb = make_tag_any<t2>(2);
     ...
-    tag_accept<>(select<t1, t2>(ta), select<t1, t2>(tb)
+    mtag_accept<>(select<t1, t2>(ta), select<t1, t2>(tb)
         [](t1, int    const& i, t1, int     const& j) {...},
         [](t1, int    const& i, t2, string  const& s) {...},
         [](t2, string const& s, t1, int     const& j) {...},
@@ -169,7 +183,7 @@ namespace tags {
     map_tag_any ta = make_tag_any<t1>(1);
     map_tag_any tb = make_tag_any<t2>(2);
     ...
-    tag_accept<>(select<t1, t2>(ta), select<t1, t2>(tb),
+    mtag_accept<>(select<t1, t2>(ta), select<t1, t2>(tb),
         [](tagged<int,    t1> const& i, tagged<int,     t1> const& j) {...},
         [](tagged<int,    t1> const& i, tagged<string,  t2> const& s) {...},
         [](tagged<string, t2> const& s, tagged<int,     t1> const& i) {...},
