@@ -20,6 +20,7 @@ namespace functional
 
     namespace detail
     {
+      using namespace std;
 
       template <class R, class... Fs>
       struct overloader;
@@ -29,7 +30,7 @@ namespace functional
       {
         using result_type = R;
         using F::operator();
-        overloader(F fct) : F(std::move(fct))
+        overloader(F fct) : F(move(fct))
         {}
       };
 
@@ -41,8 +42,8 @@ namespace functional
         using F::operator();
         using base_type::operator();
         overloader(F fct, Fs... fcts)
-        : F(std::move(fct)),
-        base_type(std::move(fcts)...)
+        : F(move(fct)),
+        base_type(move(fcts)...)
         {}
       };
     } // detail
@@ -50,8 +51,8 @@ namespace functional
     template <class R, class ... Fs>
     auto make_overload(Fs &&... fcts)
     {
-      return detail::overloader<R, std::decay_t<Fs>...>(
-          std::forward<Fs>(fcts)...);
+      using namespace std;
+      return detail::overloader<R, decay_t<Fs>...>(forward<Fs>(fcts)...);
     }
 
   } // v0

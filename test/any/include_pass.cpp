@@ -36,62 +36,7 @@ namespace tags
 int main()
 {
   using namespace tags;
-  {
-    // example
-    boost::any a = 2;
-    accept<void, int, std::string>(a,
-        [](int& i)
-        {
-        },
-        [](std::string& i)
-        {
-          BOOST_TEST(false);
-        }
-    );
-  }
-  //#if defined D2014
 
-  {
-    // example
-    boost::any a = 2;
-    accept<void, int>(a,
-        [](int& i)
-        {},
-        [](auto&)
-        {
-          BOOST_TEST(false);
-        }
-    );
-  }
-  //#endif
-
-  {
-    // example
-    boost::any a = std::string("2");
-    int i = accept<int, int, std::string>(a,
-        [](int& i)
-        {
-          BOOST_TEST(false);
-          return i;
-        },
-        [](std::string& i)
-        { return 1;}
-    );
-    std::cout << i << std::endl;
-  }
-  {
-    // example
-    // taking a list of accepted types for this argument.
-    boost::any a = 2;
-    accept<void>(a, types<int, std::string>{},
-        [](int& i)
-        {},
-        [](std::string& i)
-        {
-          BOOST_TEST(false);
-        }
-    );
-  }
   {
     // example
     // taking a list of accepted types for this argument.
