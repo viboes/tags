@@ -6,10 +6,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_CONFIG_HPP
-#define BOOST_TAGS_V0_CONFIG_HPP
+#ifndef TAGS_V0_CONFIG_HPP
+#define TAGS_V0_CONFIG_HPP
 
 #include <boost/config.hpp>
-#include <tags/v0/inline_namespace.hpp>
+#include <config/inline_namespace.hpp>
 
 #endif // header

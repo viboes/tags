@@ -6,13 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_MAP_TAG_ANY_HPP
-#define BOOST_TAGS_V0_MAP_TAG_ANY_HPP
+#ifndef TAGS_V0_MAP_TAG_ANY_HPP
+#define TAGS_V0_MAP_TAG_ANY_HPP
 
 #include <tags/v0/config.hpp>
 #include <tags/v0/tagged.hpp>
 #include <tags/v0/tag.hpp>
-#include <tags/v0/types.hpp>
+#include <meta/v0/types.hpp>
 
 #include <boost/any.hpp>
 
@@ -20,7 +20,9 @@
 #include <map>
 
 namespace tags {
-  TAGS_INLINE_NAMESPACE(v0) {
+  CONFIG_INLINE_NAMESPACE(v0) {
+
+    using meta::types;
 
     /// @c map_tag_any is a kind of map mapping types to any
     /// This is simmilar to a tagged @c fusion::tuple, but having a variadic number of elements.

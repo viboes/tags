@@ -6,13 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_TAGGED_HPP
-#define BOOST_TAGS_V0_TAGGED_HPP
+#ifndef TAGS_V0_TAGGED_HPP
+#define TAGS_V0_TAGGED_HPP
 
 #include <tags/v0/config.hpp>
 
 namespace tags {
-  TAGS_INLINE_NAMESPACE(v0) {
+  CONFIG_INLINE_NAMESPACE(v0) {
 
     template< class Type, class Tag >
     struct tagged
@@ -31,6 +31,8 @@ namespace tags {
       typedef T type;
     };
 
+    template< class T >
+    using value_type_t = typename value_type<T>::type;
   }
 }
 

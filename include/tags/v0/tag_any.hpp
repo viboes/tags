@@ -6,20 +6,23 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_TAG_ANY_HPP
-#define BOOST_TAGS_V0_TAG_ANY_HPP
+#ifndef TAGS_V0_TAG_ANY_HPP
+#define TAGS_V0_TAG_ANY_HPP
 
 #include <tags/v0/config.hpp>
 #include <tags/v0/tagged.hpp>
 #include <tags/v0/tag.hpp>
-#include <tags/v0/types.hpp>
+#include <meta/v0/types.hpp>
+#include <functional/v0/overload.hpp>
 
 #include <boost/any.hpp>
 
 #include <typeindex>
 
 namespace tags {
-  TAGS_INLINE_NAMESPACE(v0) {
+  CONFIG_INLINE_NAMESPACE(v0) {
+
+    using meta::types;
 
     struct tag_any {
       std::type_index index;

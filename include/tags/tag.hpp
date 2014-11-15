@@ -6,9 +6,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_TAGGED_HPP
-#define TAGS_TAGGED_HPP
+#ifndef TAGS_TAG_HPP
+#define TAGS_TAG_HPP
 
-#include <tags/v0/tagged.hpp>
+#include <tags/v0/tag.hpp>
 
 #endif // header

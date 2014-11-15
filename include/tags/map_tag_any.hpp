@@ -6,9 +6,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_TAGGED_HPP
-#define TAGS_TAGGED_HPP
+#ifndef TAGS_MAP_TAG_ANY_HPP
+#define TAGS_MAP_TAG_ANY_HPP
 
-#include <tags/v0/tagged.hpp>
+#include <tags/v0/tag_any.hpp>
 
 #endif // header

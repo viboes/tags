@@ -6,15 +6,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_TAG_HPP
-#define BOOST_TAGS_V0_TAG_HPP
+#ifndef TAGS_V0_TAG_HPP
+#define TAGS_V0_TAG_HPP
 
 #include <tags/v0/config.hpp>
 #include <tags/v0/tagged.hpp>
 #include <typeindex>
 
 namespace tags {
-  TAGS_INLINE_NAMESPACE(v0) {
+  CONFIG_INLINE_NAMESPACE(v0) {
 
     /// An absolute tag has associated two informations available at compile time
     ///   * The type associated to a tag know at compile time. To do so the user must specialize the tag_type struct.

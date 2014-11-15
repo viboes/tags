@@ -6,18 +6,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_TAGS_V0_TYPES_HPP
-#define BOOST_TAGS_V0_TYPES_HPP
+#ifndef TAGS_TAG_ANY_HPP
+#define TAGS_TAG_ANY_HPP
 
-#include <tags/v0/config.hpp>
-
-namespace tags {
-  TAGS_INLINE_NAMESPACE(v0) {
-
-    template < class ...Ts >
-    struct types {};
-
-  }
-}
+#include <tags/v0/tag_any.hpp>
 
 #endif // header

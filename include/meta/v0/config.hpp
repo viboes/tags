@@ -6,9 +6,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_TAGGED_HPP
-#define TAGS_TAGGED_HPP
+#ifndef META_V0_CONFIG_HPP
+#define META_V0_CONFIG_HPP
 
-#include <tags/v0/tagged.hpp>
+#include <boost/config.hpp>
+#include <config/inline_namespace.hpp>
 
 #endif // header

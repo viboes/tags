@@ -6,9 +6,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_TAGGED_HPP
-#define TAGS_TAGGED_HPP
+#ifndef META_V0_TYPES_HPP
+#define META_V0_TYPES_HPP
 
-#include <tags/v0/tagged.hpp>
+#include <meta/v0/config.hpp>
+
+namespace meta {
+  CONFIG_INLINE_NAMESPACE(v0) {
+
+    template < class ...Ts >
+    struct types {};
+
+  }
+}
 
 #endif // header

@@ -8,12 +8,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_V0_INLINE_NAMESPACE_HPP
-#define TAGS_V0_INLINE_NAMESPACE_HPP
+#ifndef FUNCTIONAL_V0_INLINE_NAMESPACE_HPP
+#define FUNCTIONAL_V0_INLINE_NAMESPACE_HPP
 
 #include <config/inline_namespace.hpp>
 
-namespace tags {
+namespace functional {
   CONFIG_DCL_INLINE_NAMESPACE(v0)
 }
 
