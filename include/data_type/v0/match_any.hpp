@@ -21,42 +21,44 @@
 
 #include <typeindex>
 
-namespace boost {
-  CONFIG_INLINE_NAMESPACE(v0) {
-
-    using meta::type;
-    using meta::types;
-
+namespace boost
+{
+  namespace any_detail
+  {
     template <class R, class T1, class F>
-    R match(any& x, types<T1>, F&& f) {
+    R match(any& x, meta::types<T1>, F&& f)
+    {
       T1 * res = any_cast<T1>(&x);
       if (res) return f(*res);
       else return f();
     }
     template <class R, class T1, class T2, class ...Ts, class F>
-    R match(any& x, types<T1, T2, Ts...>, F&& f) {
+    R match(any& x, meta::types<T1, T2, Ts...>, F&& f)
+    {
       T1 * res = any_cast<T1>(&x);
       if (res) return f(*res);
-      else return boost::match<R>(x, types<T2, Ts...>(), std::forward<F>(f));
+      else return any_detail::match<R>(x, meta::types<T2, Ts...>(), std::forward<F>(f));
     }
 
     template <class R, class T, class ...Ts, class F1, class F2, class ...Fs>
-    R match(any& x, types<T, Ts...>, F1&& f1, F2&& f2, Fs&&... fs) {
-      return boost::match<R>(x, types<T, Ts...>(),
-                      functional::make_overload<R>(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...)
-                     );
+    R match(any& x, meta::types<T, Ts...>, F1&& f1, F2&& f2, Fs&&... fs)
+    {
+      return any_detail::match<R>(x, meta::types<T, Ts...>(),
+          functional::make_overload<R>(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...)
+      );
     }
-
     template <class R, class Types, class ...Fs>
-    R match(functional::selector<any, Types> && x, Fs&&... fs) {
-      return boost::match<R>(x.value, Types{}, std::forward<Fs>(fs)...);
+    R match(functional::selector<any, Types> && x, Fs&&... fs)
+    {
+      return any_detail::match<R>(x.value, Types
+          {}, std::forward<Fs>(fs)...);
     }
+  }
 
-    template <class R, class Types, class F>
-    R match(type<R>, type<functional::selector<any, Types>>, functional::selector<any, Types> const& x, F&& f) {
-      return boost::match<R>(x.value, Types{}, std::forward<F>(f));
-    }
-
+  template <class R, class Types, class F>
+  R match(meta::type<R>, meta::type<functional::selector<any, Types>>, functional::selector<any, Types> const& x, F&& f)
+  {
+    return any_detail::match<R>(x.value, Types{}, std::forward<F>(f));
   }
 }
 

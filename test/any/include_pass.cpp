@@ -21,10 +21,10 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    boost::match<void>(a, types<int, std::string>{},
-        [](int& i)
+    functional::match<void>(select<types<int, std::string>>(a),
+        [](int i)
         {},
-        [](std::string& i)
+        [](std::string const& i)
         {
           BOOST_TEST(false);
         },
@@ -38,12 +38,12 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = std::string("2");
-    boost::match<void>(a, types<int, std::string>{},
-        [](int& i)
+    functional::match<void>(select<types<int, std::string>>(a),
+        [](int i)
         {
           BOOST_TEST(false);
         },
-        [](std::string& i)
+        [](std::string const& i)
         {},
         [](...)
         {
@@ -55,8 +55,8 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    boost::match<void>(a, types<int, std::string>{},
-        [](std::string& i)
+    functional::match<void>(select<types<int, std::string>>(a),
+        [](std::string const& i)
         {
           BOOST_TEST(false);
         },
@@ -70,8 +70,8 @@ int main()
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    boost::match<void>(a, types<int, std::string>{},
-        [&j](std::string& i)
+    functional::match<void>(select<types<int, std::string>>(a),
+        [&j](std::string i)
         {
           BOOST_TEST(false);
         },
@@ -85,8 +85,8 @@ int main()
     // example ...
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    boost::match<void>(a, types<int>{},
-        [](int& i)
+    functional::match<void>(select<types<int>>(a),
+        [](int i)
         {
         },
         [](...)
@@ -100,8 +100,8 @@ int main()
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    boost::match<void>(select<types<int, std::string>>(a),
-        [&j](std::string& i)
+    functional::match<void>(select<types<int, std::string>>(a),
+        [&j](std::string const& i)
         {
           BOOST_TEST(false);
         },
@@ -117,6 +117,21 @@ int main()
     boost::any a = "2";
     functional::match<void>(select<types<int>>(a),
         [](int const&i)
+        {
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+
+        }
+    );
+  }
+  {
+    // functional::match functional::select<types<>>(a)
+    // taking a list of accepted types for this argument.
+    boost::any a = 2;
+    functional::match<void>(select<types<int>>(a),
+        [](std::string const&i)
         {
           BOOST_TEST(false);
         },
