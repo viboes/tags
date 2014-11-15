@@ -6,42 +6,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <tags/v0/any.hpp>
+#include <data_type/v0/match_any.hpp>
 #include <functional/v0/match.hpp>
 
 #include <string>
 
 #include <boost/detail/lightweight_test.hpp>
 
-struct t1
-{};
-
-struct t2
-{};
-
-namespace tags
-{
-  template<>
-  struct tag_type<t1>
-  {
-    typedef int type;
-  };
-  template<>
-  struct tag_type<t2>
-  {
-    typedef std::string type;
-  };
-}
-
 int main()
 {
-  using namespace tags;
-
+  using namespace meta;
+  using namespace functional;
   {
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    match<void>(a, types<int, std::string>{},
+    boost::match<void>(a, types<int, std::string>{},
         [](int& i)
         {},
         [](std::string& i)
@@ -58,7 +38,7 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = std::string("2");
-    match<void>(a, types<int, std::string>{},
+    boost::match<void>(a, types<int, std::string>{},
         [](int& i)
         {
           BOOST_TEST(false);
@@ -75,7 +55,7 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    match<void>(a, types<int, std::string>{},
+    boost::match<void>(a, types<int, std::string>{},
         [](std::string& i)
         {
           BOOST_TEST(false);
@@ -90,7 +70,7 @@ int main()
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    match<void>(a, types<int, std::string>{},
+    boost::match<void>(a, types<int, std::string>{},
         [&j](std::string& i)
         {
           BOOST_TEST(false);
@@ -105,7 +85,7 @@ int main()
     // example ...
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    match<void>(a, types<int>{},
+    boost::match<void>(a, types<int>{},
         [](int& i)
         {
         },
@@ -116,11 +96,11 @@ int main()
     );
   }
   {
-    // example select<types<>>(a)
+    // example functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    match<void>(select<types<int, std::string>>(a),
+    boost::match<void>(select<types<int, std::string>>(a),
         [&j](std::string& i)
         {
           BOOST_TEST(false);
@@ -132,7 +112,7 @@ int main()
     );
   }
   {
-    // functional::match select<types<>>(a)
+    // functional::match functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = "2";
     functional::match<void>(select<types<int>>(a),
@@ -147,7 +127,7 @@ int main()
     );
   }
   {
-    // functional::match_tuple select<types<>>(a)
+    // functional::match_all functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     boost::any b = 2;
@@ -170,7 +150,7 @@ int main()
   // compile fail as there is no overload for 'int'
   {
     boost::any a = 2;
-    match<void>(a, types<int, std::string>{},
+    boost::match<void>(a, types<int, std::string>{},
         [](std::string& i)
         {
           BOOST_TEST(false);
@@ -180,7 +160,7 @@ int main()
   {
     // compile fail as there is no overload for cath all 'boost::any'
     boost::any a = 2;
-    match<void>(a, types<std::string>{},
+    boost::match<void>(a, types<std::string>{},
         [](std::string& i)
         {
           BOOST_TEST(false);

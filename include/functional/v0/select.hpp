@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef TAGS_V0_SELECT_HPP
-#define TAGS_V0_SELECT_HPP
+#ifndef FUNCTIONAL_V0_SELECT_HPP
+#define FUNCTIONAL_V0_SELECT_HPP
 
 #include <tags/v0/config.hpp>
 #include <meta/v0/none.hpp>
@@ -16,7 +16,7 @@
 #include <utility>
 #include <type_traits>
 
-namespace tags {
+namespace functional {
   CONFIG_INLINE_NAMESPACE(v0) {
 
     template < class T, class Types >
