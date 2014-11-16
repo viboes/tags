@@ -11,6 +11,7 @@
 #include <functional/v0/tags.hpp>
 
 #include <string>
+#include <functional>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -62,6 +63,46 @@ int main()
         [](int i)
         {},
         [](std::string const& i)
+        {
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+        }
+    );
+  }
+  {
+    // example
+    // taking a list of accepted types for this argument.
+    int i = 0;
+    boost::any a = &i;
+    functional::match<void>(select<types<int*>>(a),
+        [](int* i)
+        {},
+        [](std::string const& i)
+        {
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+        }
+    );
+  }
+  {
+    // example
+    // taking a list of accepted types for this argument.
+    int i = 0;
+    boost::any a = std::ref(i);
+    functional::match<void>(select<types<std::reference_wrapper<int>>>(a),
+        [](std::reference_wrapper<int> i)
+        {},
+        [](std::string const& i)
+        {
+          BOOST_TEST(false);
+        },
+        [](auto&)
         {
           BOOST_TEST(false);
         },
