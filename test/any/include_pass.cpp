@@ -20,6 +20,12 @@ struct t1
 struct t2
 {};
 
+struct t3
+{};
+
+struct t4
+{};
+
 namespace functional
 {
   template<>
@@ -31,6 +37,16 @@ namespace functional
   struct tag_type<t2>
   {
     typedef std::string type;
+  };
+  template<>
+  struct tag_type<t3>
+  {
+    typedef int& type;
+  };
+  template<>
+  struct tag_type<t4>
+  {
+    typedef int* type;
   };
 }
 
@@ -339,6 +355,43 @@ int main()
         }
     );
   }
+  {
+    int i;
+    boost::any a = make_tagged<t3>(i);
+    functional::match<void>(functional::select<functional::tags<t3>>(a),
+        [](tagged<int&, t3> i)
+        {
+        },
+        [](auto && i)
+        {
+          std::cout << typeid(i).name() << std::endl;
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+        }
+    );
+  }
+  {
+    int i;
+    boost::any a = make_tagged<t4>(&i);
+    functional::match<void>(functional::select<functional::tags<t4>>(a),
+        [](tagged<int*, t4> i)
+        {
+        },
+        [](auto && i)
+        {
+          std::cout << typeid(i).name() << std::endl;
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+        }
+    );
+  }
+
 
   return boost::report_errors();
 }

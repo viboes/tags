@@ -60,6 +60,50 @@ namespace functional {
         value_type val;
     };
 
+    template< class Type, class Tag >
+    struct tagged<Type &, Tag>
+    {
+        typedef Type& value_type;
+        typedef Tag tag_type;
+
+        tagged() = default;
+        tagged(tagged const&) = default;
+        tagged(tagged &&) = default;
+        tagged& operator=(tagged const&) = default;
+        tagged& operator=(tagged &&) = default;
+
+        tagged(Type & v)
+        : val(&v) {}
+
+        value_type& value() { return *val; }
+        value_type const& value() const { return *val; }
+
+    private:
+        Type* val;
+    };
+
+    template< class Type, class Tag >
+    struct tagged<Type *, Tag>
+    {
+        typedef Type* value_type;
+        typedef Tag tag_type;
+
+        tagged() = default;
+        tagged(tagged const&) = default;
+        tagged(tagged &&) = default;
+        tagged& operator=(tagged const&) = default;
+        tagged& operator=(tagged &&) = default;
+
+        tagged(Type * v)
+        : val(v) {}
+
+        Type* value() { return val; }
+        Type const* value() const { return val; }
+
+    private:
+        Type* val;
+    };
+
     template< class Tag, class Type >
     tagged<tag_type_t<Tag>, Tag> make_tagged(Type && x)
     {
