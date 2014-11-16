@@ -257,21 +257,6 @@ int main()
   {
     // functional::match functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
-    boost::any a = make_tagged<t2>("1");
-    functional::match<void>(functional::select<types<tagged<int,t1>>>(a),
-        [](tagged<int, t1> const&i)
-        {
-          BOOST_TEST(false);
-        },
-        [](...)
-        {
-
-        }
-    );
-  }
-  {
-    // functional::match functional::select<types<>>(a)
-    // taking a list of accepted types for this argument.
     boost::any a = make_tagged<t1>(1);
     functional::match<void>(functional::select<functional::tags<t1>>(a),
         [](tagged<int, t1> i)
@@ -280,7 +265,22 @@ int main()
         [](...)
         {
           BOOST_TEST(false);
-
+        }
+    );
+  }
+  {
+    boost::any a = make_tagged<t2>("a");
+    functional::match<void>(functional::select<functional::tags<t1,t2>>(a),
+        [](tagged<int, t1> i)
+        {
+          BOOST_TEST(false);
+        },
+        [](tagged<std::string, t2> i)
+        {
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
         }
     );
   }

@@ -42,21 +42,15 @@ namespace functional {
         typedef Type value_type;
         typedef Tag tag_type;
 
-        //tagged() = default;
-        //tagged(tagged const&) = default;
-        //tagged(tagged &&) = default;
-        //tagged& operator=(tagged const&) = default;
-        //tagged& operator=(tagged &&) = default;
+        tagged() = default;
+        tagged(tagged const&) = default;
+        tagged(tagged &&) = default;
+        tagged& operator=(tagged const&) = default;
+        tagged& operator=(tagged &&) = default;
 
-//        template <class T>
-//        tagged(T && v)
-//        : val(std::forward<T>(v)) {}
-
-        tagged(value_type const& v)
-        : val(v) {}
-
-        tagged(value_type && v)
-        : val(std::move(v)) {}
+        template <class T>
+        tagged(T && v)
+        : val(std::forward<T>(v)) {}
 
         value_type& value() { return val; }
         value_type const& value() const { return val; }
