@@ -17,8 +17,8 @@
     </tr>
 </table>
 
-C++ generic overload function
-=============================
+C++ tags library
+================
 
 Experimental tags library for C++17.
 
