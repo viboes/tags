@@ -17,7 +17,7 @@
     </tr>
 </table>
 
-C++ generic overload function
+C++ generic match function
 =============================
 
 Experimental overload function for C++17.
