@@ -45,12 +45,12 @@ namespace functional
       class applier;
 
       template <class Final, class R, class F, class ... DTs, class ... STs>
-      class applier<Final, R, F, tuple<const DTs &...>, tuple<const STs &...>, meta::types<> >
+      class applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, meta::types<> >
       {
       public:
 
-        applier(R *r, F &fct, tuple<const DTs &...> &&members,
-        tuple<const STs &...> &&sums)
+        applier(R *r, F &fct, tuple<DTs const&...> &&members,
+        tuple<STs const&...> &&sums)
         : fct(fct),
           r(r),
           members(move(members)),
@@ -59,8 +59,8 @@ namespace functional
 
         F &fct;
         R *r;
-        tuple<const DTs &...> members;
-        tuple<const STs &...> sums;
+        tuple<DTs const&...> members;
+        tuple<STs const&...> sums;
 
         void operator()() const
         {
@@ -69,19 +69,19 @@ namespace functional
       };
 
       template <class Final, class R, class F, class... DTs, class... STs, class T, class... Ts>
-      class applier<Final, R, F, tuple<const DTs &...>, tuple<const STs &...>, types<T, Ts...>>
-      : public applier<Final, R, F, tuple<const DTs &...>, tuple<const STs &...>, types<Ts...>>
+      class applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<T, Ts...>>
+      : public applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<Ts...>>
       {
       public:
 
-        using super = applier<Final, R, F, tuple<const DTs &...>, tuple<const STs &...>, types<Ts...>>;
+        using super = applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<Ts...>>;
         /* Pass everything up to the base case. */
-        applier(R *r, F &fct, tuple<const DTs &...> &&members, tuple<const STs &...> &&sums)
+        applier(R *r, F &fct, tuple<DTs const&...> &&members, tuple<STs const&...> &&sums)
           : super(r, fct, move(members), move(sums))
         {}
 
         using super::operator();
-        void operator()(const T &v) const
+        void operator()(T const&v) const
         {
           dispatch(index_sequence_for<DTs...>(), v, index_sequence_for<STs...>());
         }
@@ -89,9 +89,9 @@ namespace functional
       private:
         template <class... ODTs>
         void dispatch_helper(
-            tuple<const ODTs &...> &&odts) const
+            tuple<ODTs const&...> &&odts) const
         {
-          make_overload<void>(
+          overload(
               [&](auto *r)
               {
                 *r = functional::apply(this->fct, move(odts));
@@ -104,11 +104,11 @@ namespace functional
         }
 
         template <class... ODTs, class ST, class... OSTs>
-        void dispatch_helper(tuple<const ODTs &...> &&odts, const ST &sum, const OSTs &... osts) const
+        void dispatch_helper(tuple<ODTs const&...> &&odts, ST const& sum, OSTs const&... osts) const
         {
-          struct applier_type : applier<applier_type, R, F, tuple<const ODTs &...>, tuple<const OSTs &...>, sum_types_t<ST> >
+          struct applier_type : applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_types_t<ST> >
           {
-            using super = applier<applier_type, R, F, tuple<const ODTs &...>, tuple<const OSTs &...>, sum_types_t<ST>>;
+            using super = applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_types_t<ST>>;
             using super::super;
           };
 
@@ -117,7 +117,7 @@ namespace functional
         }
 
         template <size_t... i, size_t... j, size_t... k>
-        void dispatch(index_sequence<i...>, const T &v, index_sequence<j...>) const
+        void dispatch(index_sequence<i...>, T const& v, index_sequence<j...>) const
         {
           dispatch_helper(forward_as_tuple(get<i>(this->members)..., v), get<j>(this->sums)...);
         }
@@ -142,13 +142,12 @@ namespace functional
         { return nullptr; }
       };
 
-      template <class F, class ST, class... STs>
-      decltype(auto) apply(F &&fct, const ST &sum, const STs &... osts)
+      template <class R, class F, class ST, class... STs>
+      decltype(auto) apply(F &&fct, ST const& sum, STs const&... osts)
       {
-        using R = typename decay_t<F>::result_type;
-        struct applier_type : applier<applier_type, R, F, tuple<>, tuple<const STs &...>, sum_types_t<ST> >
+        struct applier_type : applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_types_t<ST> >
         {
-          using super = applier<applier_type, R, F, tuple<>, tuple<const STs &...>, sum_types_t<ST> >;
+          using super = applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_types_t<ST> >;
           using super::super;
         };
 
@@ -161,22 +160,22 @@ namespace functional
     } // detail
 
     template <class R, class ST, class... Fs>
-    decltype(auto) match(const ST &that, Fs &&... fcts)
+    decltype(auto) match(ST const& that, Fs &&... fcts)
     {
       using namespace std;
 
-      return detail::apply(make_overload<R>(forward<Fs>(fcts)...), that);
+      return detail::apply<R>(overload(forward<Fs>(fcts)...), that);
     }
 
     template <class R, class... STs, class... Fs>
-    decltype(auto) match_all(const std::tuple<STs...> &those, Fs &&... fcts)
+    decltype(auto) match_all(std::tuple<STs...> const& those, Fs &&... fcts)
     {
       using namespace std;
 
       return functional::apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply(make_overload<R>(forward<Fs>(fcts)...), forward<decltype(args)>(args)...);
+            return detail::apply<R>(overload(forward<Fs>(fcts)...), forward<decltype(args)>(args)...);
           },
           those);
     }

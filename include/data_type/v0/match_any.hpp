@@ -44,7 +44,7 @@ namespace boost
     R match(any& x, meta::types<T, Ts...>, F1&& f1, F2&& f2, Fs&&... fs)
     {
       return any_detail::match<R>(x, meta::types<T, Ts...>(),
-          functional::make_overload<R>(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...)
+          functional::overload(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...)
       );
     }
     template <class R, class Types, class ...Fs>

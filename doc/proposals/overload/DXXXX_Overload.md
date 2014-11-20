@@ -24,15 +24,93 @@ Experimental overload function for C++17.
 
 # Introduction
 
-This paper present a proposal for an `overload` function.
+This paper present a proposal for an `overload` function that allow to overload lambdas 
+as well as function or function objects.
 
 
 # Motivation and Scope
 
+As lambdas are functions and not function objects, can’t be overloaded in the usual 
+implicit way, but they can be “explicitly overloaded” using the proposed `overload` 
+function:
 
-# Tutorial
+This function would be especially useful for creating visitors, e.g. for variant.
+
+```c++
+     auto visitor = overload(
+        [](int i, int j )         {          ...        },
+        [](int i, string const &j )         {          ...        },
+        [](auto const &i, auto const &j )        {          ...        }
+    );
+    
+    visitor( 1, std::string{"2"} ); // ok - calls (int,std::string) "overload"
+
+```
+
+The `overload` function when there are only two parameters can be defined as follows
+
+```c++
+  template<class F1, class F2> struct overloaded : F1, F2
+  {
+    overloaded(F1 x1, F2 x2) : F1(x1), F2(x2) {}
+    using F1::operator();
+    using F2::operator();
+  };
+  template<class F1, class F2>
+  overloaded<F1, F2> overload(F1 f1, F2 f2)
+  { return overloaded<F1, F2>(f1, f2); }
+```
+
 
 # Design rationale
+
+## Binary or variadic interface
+
+We could either provide a binary or a variadic `overload` function. 
+
+```c++
+     auto visitor = 
+     overload([](int i, int j )         {          ...        },
+     overload([](int i, string const &j )         {          ...        },
+        [](auto const &i, auto const &j )        {          ...        }
+     ));
+
+```
+
+The binary function needs to repeat the overload word for each new overloaded function.
+
+
+We think that the variadic version is not much more complex to implement and make user 
+code simpler.
+
+
+## Passing parameters by value or by forward reference
+
+The function `overload` must store the passed parameters. If the interface is by value, 
+the user will be forced to `move` movable but non-copyable function objects. Using forward 
+references has not this inconvenient, and the implementation can optimize when the 
+function object is copyable.
+
+## Result type of `overload`
+
+The proposed `overload` function doesn't adds any contraint on the result type of the overloaded functions.
+
+We can consider 3 other alternatives:
+
+* let the function object just return the type returned by each overload,
+* explicit return type `R`: the result type is `R` and the result type of the overloads must be explicitly convertible to `R`,
+* `common_type`: the result type is the `common_type` of the result of the overloads,
+* `variant`: the result type is the `variant` of the unique result types of the overloads
+
+Each one of these alternatives needs a specific interface:
+
+* `overload`
+* `explicit_overload`
+* `common_type_overload`
+* `variant_overload`
+
+
+For a sake of simplicity this proposal only contains the `overload` version.
 
 # Technical Specification
 
@@ -46,7 +124,6 @@ namespace experimental
 {
 inline namespace fundamental_v2
 {
-
     template <class R, class ... Fs>
     'see below' overload(Fs &&... fcts);
 }
@@ -56,14 +133,26 @@ inline namespace fundamental_v2
 
 ## Template function `overload` 
 
+```c++
+    template <class R, class ... Fs>
+    'see below' overload(Fs &&... fcts);
+
+```
+
+*Requires:* there is a `common_type` of the result of the overloads, which will be the result type of the `overload` function.
+
+*Returns:* A function object that behaves as if all the parameters were overloaded when 
+calling it.
+
+*Thows:* Any exception throw during the construction of the resulting function object.
 
 ## Implementation
 
-There is an implementation at https://github.com/viboes/tags.
+There is an implementation of the explicit return type version at https://github.com/viboes/tags.
 
 # Acknowledgements 
 
-Many thanks to XXX. 
+Many thanks to Matt Calabrese who suggested the `common_type` alternative as the more common. 
 
 # References
 

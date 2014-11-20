@@ -40,6 +40,11 @@ project tags
       <toolset>intel-win:<iterator_debugging>off
     ;
 
+test-suite ts_overload
+    : 
+      [ run overload/include_pass.cpp : : : : overload_include_p ]
+    ;
+
 test-suite ts_tag
     : 
       [ run tag/include_pass.cpp : : : : tag_include_p ]
