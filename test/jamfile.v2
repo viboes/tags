@@ -65,6 +65,11 @@ test-suite ts_variant
       [ run variant/include_pass.cpp : : : : variant_include_p ]
     ;
 
+test-suite ts_maybe
+    : 
+      [ run maybe/include_pass.cpp : : : : vmaybe_include_p ]
+    ;
+
 test-suite ts_tag_any
     : 
       [ run tag_any/include_pass.cpp : : : : tag_any_include_p ]
