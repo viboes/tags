@@ -23,9 +23,7 @@ namespace functional {
       decltype(auto) apply_impl(Function &&fn,
                                 Tuple &&tuple,
                                 std::index_sequence<i...>) {
-        using namespace std;
-
-        return forward<Function>(fn)(get<i>(forward<Tuple>(tuple))...);
+        return std::forward<Function>(fn)(std::get<i>(std::forward<Tuple>(tuple))...);
       }
 
     } // detail
@@ -34,12 +32,10 @@ namespace functional {
 
     template <class Function, class Tuple>
     decltype(auto) apply(Function &&fn, Tuple &&tuple) {
-      using namespace std;
-
-      return detail::apply_impl(forward<Function>(fn),
-                        forward<Tuple>(tuple),
-                        make_index_sequence<
-                            tuple_size<decay_t<Tuple>>::value>());
+      return detail::apply_impl(std::forward<Function>(fn),
+                        std::forward<Tuple>(tuple),
+                        std::make_index_sequence<
+                        std::tuple_size<std::decay_t<Tuple>>::value>());
     }
 
   }

@@ -40,8 +40,6 @@ namespace functional
 
     namespace detail
     {
-      using namespace std;
-
       template <class Final, class Result, class Functor, class DataTypeTuple, class STs, class Types>
       class applier;
 
@@ -54,8 +52,8 @@ namespace functional
         tuple<STs const&...> &&sums)
         : fct(fct),
           r(r),
-          members(move(members)),
-          sums(move(sums))
+          members(std::move(members)),
+          sums(std::move(sums))
         {}
 
         F &fct;
@@ -78,7 +76,7 @@ namespace functional
         using super = applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<Ts...>>;
         /* Pass everything up to the base case. */
         applier(R *r, F &fct, tuple<DTs const&...> &&members, tuple<STs const&...> &&sums)
-          : super(r, fct, move(members), move(sums))
+          : super(r, fct, std::move(members), std::move(sums))
         {}
 
         using super::operator();
@@ -95,11 +93,11 @@ namespace functional
           overload(
               [&](auto *r)
               {
-                *r = functional::apply(this->fct, move(odts));
+                *r = functional::apply(this->fct, std::move(odts));
               },
               [&](void *)
               {
-                functional::apply(this->fct, move(odts));
+                functional::apply(this->fct, std::move(odts));
               }
           )(this->r);
         }
@@ -114,13 +112,13 @@ namespace functional
           };
 
           // customization point
-          match(type<R>{}, type<ST>{}, sum, applier_type(this->r, this->fct, move(odts), forward_as_tuple(osts...)));
+          match(type<R>{}, type<ST>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
         }
 
         template <size_t... i, size_t... j, size_t... k>
         void dispatch(index_sequence<i...>, T const& v, index_sequence<j...>) const
         {
-          dispatch_helper(forward_as_tuple(get<i>(this->members)..., v), get<j>(this->sums)...);
+          dispatch_helper(std::forward_as_tuple(get<i>(this->members)..., v), get<j>(this->sums)...);
         }
       };
 
@@ -128,7 +126,7 @@ namespace functional
       struct storage
       {
         R get()
-        { return move(r);}
+        { return std::move(r);}
         R *ptr()
         { return &r;}
         R r;
@@ -154,8 +152,8 @@ namespace functional
 
         storage<R> r;
         // customization point
-        match(type<R>{}, type<ST>{}, sum, applier_type(r.ptr(), fct, forward_as_tuple(), forward_as_tuple(osts...)));
-        return move(r).get();
+        match(type<R>{}, type<ST>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+        return std::move(r).get();
       }
 
     } // detail
@@ -163,20 +161,16 @@ namespace functional
     template <class R, class ST, class... Fs>
     decltype(auto) match(ST const& that, Fs &&... fcts)
     {
-      using namespace std;
-
-      return detail::apply<R>(overload(forward<Fs>(fcts)...), that);
+      return detail::apply<R>(overload(std::forward<Fs>(fcts)...), that);
     }
 
     template <class R, class... STs, class... Fs>
     decltype(auto) match_all(std::tuple<STs...> const& those, Fs &&... fcts)
     {
-      using namespace std;
-
       return functional::apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply<R>(overload(forward<Fs>(fcts)...), forward<decltype(args)>(args)...);
+            return detail::apply<R>(overload(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
           },
           those);
     }

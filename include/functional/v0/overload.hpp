@@ -85,15 +85,13 @@ namespace functional
     template <class ... Fs>
     auto overload(Fs &&... fcts)
     {
-      using namespace std;
-      return detail::overloader<decay_t<Fs>...>(forward<Fs>(fcts)...);
+      return detail::overloader<std::decay_t<Fs>...>(std::forward<Fs>(fcts)...);
     }
 
     template <class R, class ... Fs>
     auto explicit_overload(Fs &&... fcts)
     {
-      using namespace std;
-      return detail::overloader_ret<R, decay_t<Fs>...>(forward<Fs>(fcts)...);
+      return detail::overloader_ret<R, std::decay_t<Fs>...>(std::forward<Fs>(fcts)...);
     }
 
   } // v0
