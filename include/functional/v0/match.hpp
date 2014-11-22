@@ -12,6 +12,7 @@
 #include <functional/v0/config.hpp>
 
 #include <functional/v0/apply.hpp>
+#include <functional/v0/overload.hpp>
 #include <meta/v0/identity.hpp>
 #include <meta/v0/none.hpp>
 #include <meta/v0/types.hpp>
