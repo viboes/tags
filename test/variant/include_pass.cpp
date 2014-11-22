@@ -60,7 +60,7 @@ int main()
   using namespace functional;
   {
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [](int i)
         {},
         [](X const& i)
@@ -76,7 +76,7 @@ int main()
   {
     int i = 0;
     boost::variant<int*, std::string> a = &i;
-    functional::match<void>(a,
+    match<void>(a,
         [](int* i)
         {},
         [](std::string const& i)
@@ -92,7 +92,7 @@ int main()
   {
     int i = 0;
     boost::variant<std::reference_wrapper<int>, std::string> a = std::ref(i);
-    functional::match<void>(a,
+    match<void>(a,
         [](std::reference_wrapper<int> i)
         {},
         [](std::string const& i)
@@ -111,7 +111,7 @@ int main()
   }
   {
     boost::variant<int, std::string> a = std::string("2");
-    functional::match<void>(a,
+    match<void>(a,
         [](int i)
         {
           BOOST_TEST(false);
@@ -126,7 +126,7 @@ int main()
   }
   {
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [](std::string const& i)
         {
           BOOST_TEST(false);
@@ -139,7 +139,7 @@ int main()
   {
     int j = 8;
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [&j](std::string i)
         {
           BOOST_TEST(false);
@@ -152,7 +152,7 @@ int main()
   }
   {
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [](int i)
         {
         },
@@ -165,7 +165,7 @@ int main()
   {
     int j = 8;
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [&j](X const& i)
         {
           BOOST_TEST(false);
@@ -178,7 +178,7 @@ int main()
   }
   {
     boost::variant<int, X> a = 2;
-    functional::match<void>(a,
+    match<void>(a,
         [](X const&i)
         {
           BOOST_TEST(false);
@@ -192,7 +192,7 @@ int main()
   {
     boost::variant<int, X> a = 2;
     boost::variant<int, X> b = 2;
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](int const &i, int const &j )
         {
         },
@@ -209,7 +209,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -226,7 +226,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -246,7 +246,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -273,7 +273,7 @@ int main()
   // tagged
   {
     boost::variant<tagged<int,t1>, tagged<std::string, t2>> a = make_tagged<t1>(1);
-    functional::match<void>(a,
+    match<void>(a,
         [](tagged<int, t1> const& i)
         {
         },
@@ -285,7 +285,7 @@ int main()
   }
   {
     boost::variant<tagged<int,t1>, std::string> a = make_tagged<t1>(1);
-    functional::match<void>(a,
+    match<void>(a,
         [](tagged<int, t1> const& i)
         {
         },
@@ -297,7 +297,7 @@ int main()
   }
 //  {
 //    boost::any a = make_tagged<t2>("a");
-//    functional::match<void>(functional::select<functional::tags<t1,t2>>(a),
+//    match<void>(functional::select<functional::tags<t1,t2>>(a),
 //        [](tagged<int, t1> i)
 //        {
 //          BOOST_TEST(false);
@@ -369,7 +369,7 @@ int main()
 //  {
 //    int i;
 //    boost::any a = make_tagged<t3>(i);
-//    functional::match<void>(functional::select<functional::tags<t3>>(a),
+//    match<void>(functional::select<functional::tags<t3>>(a),
 //        [](tagged<int&, t3> i)
 //        {
 //        },
@@ -387,7 +387,7 @@ int main()
 //  {
 //    int i;
 //    boost::any a = make_tagged<t4>(&i);
-//    functional::match<void>(functional::select<functional::tags<t4>>(a),
+//    match<void>(functional::select<functional::tags<t4>>(a),
 //        [](tagged<int*, t4> i)
 //        {
 //        },

@@ -22,7 +22,7 @@ int main()
   using namespace data_type;
   {
     maybe<int> a = just(2);
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<int> i)
         {},
         [](nothing_t i)
@@ -33,7 +33,7 @@ int main()
   }
   {
     maybe<int> a = just(2);
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<int> i)
         {},
         [](...)
@@ -44,7 +44,7 @@ int main()
   }
   {
     maybe<int> a = nothing;
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<int> i)
         {
           BOOST_TEST(false);
@@ -56,7 +56,7 @@ int main()
   }
   {
     maybe<int> a;
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<int> i)
         {
           BOOST_TEST(false);
@@ -70,7 +70,7 @@ int main()
   {
     int i = 0;
     maybe<int*> a = just(&i);
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<int*> i)
         {},
         [](nothing_t const&i)
@@ -82,7 +82,7 @@ int main()
   {
     int i = 0;
     maybe<std::reference_wrapper<int>> a = just(std::ref(i));
-    functional::match<void>(a,
+    match<void>(a,
         [](just_t<std::reference_wrapper<int>> i)
         {},
         [](nothing_t const&i)
@@ -94,7 +94,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = just(2);
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
         },
@@ -108,7 +108,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = nothing;
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
           BOOST_TEST(false);
@@ -125,7 +125,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = nothing;
-    functional::match_all<void>(std::make_tuple(a, b),
+    match_all<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
           BOOST_TEST(false);

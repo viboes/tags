@@ -59,7 +59,7 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    functional::match<void>(select<types<int, std::string>>(a),
+    match<void>(select<types<int, std::string>>(a),
         [](int i)
         {},
         [](std::string const& i)
@@ -77,7 +77,7 @@ int main()
     // taking a list of accepted types for this argument.
     int i = 0;
     boost::any a = &i;
-    functional::match<void>(select<types<int*>>(a),
+    match<void>(select<types<int*>>(a),
         [](int* i)
         {},
         [](std::string const& i)
@@ -95,7 +95,7 @@ int main()
     // taking a list of accepted types for this argument.
     int i = 0;
     boost::any a = std::ref(i);
-    functional::match<void>(select<types<std::reference_wrapper<int>>>(a),
+    match<void>(select<types<std::reference_wrapper<int>>>(a),
         [](std::reference_wrapper<int> i)
         {},
         [](std::string const& i)
@@ -116,7 +116,7 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = std::string("2");
-    functional::match<void>(select<types<int, std::string>>(a),
+    match<void>(select<types<int, std::string>>(a),
         [](int i)
         {
           BOOST_TEST(false);
@@ -133,7 +133,7 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    functional::match<void>(select<types<int, std::string>>(a),
+    match<void>(select<types<int, std::string>>(a),
         [](std::string const& i)
         {
           BOOST_TEST(false);
@@ -148,7 +148,7 @@ int main()
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    functional::match<void>(select<types<int, std::string>>(a),
+    match<void>(select<types<int, std::string>>(a),
         [&j](std::string i)
         {
           BOOST_TEST(false);
@@ -163,7 +163,7 @@ int main()
     // example ...
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    functional::match<void>(select<types<int>>(a),
+    match<void>(select<types<int>>(a),
         [](int i)
         {
         },
@@ -178,7 +178,7 @@ int main()
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     int j = 8;
-    functional::match<void>(select<types<int, std::string>>(a),
+    match<void>(select<types<int, std::string>>(a),
         [&j](std::string const& i)
         {
           BOOST_TEST(false);
@@ -190,10 +190,10 @@ int main()
     );
   }
   {
-    // functional::match functional::select<types<>>(a)
+    // match functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = "2";
-    functional::match<void>(select<types<int>>(a),
+    match<void>(select<types<int>>(a),
         [](int const&i)
         {
           BOOST_TEST(false);
@@ -205,10 +205,10 @@ int main()
     );
   }
   {
-    // functional::match functional::select<types<>>(a)
+    // match functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = 2;
-    functional::match<void>(select<types<int>>(a),
+    match<void>(select<types<int>>(a),
         [](std::string const&i)
         {
           BOOST_TEST(false);
@@ -220,11 +220,11 @@ int main()
     );
   }
   {
-    // functional::match_all functional::select<types<>>(a)
+    // match_all functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     boost::any b = 2;
-    functional::match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int const &i, int const &j )
         {
         },
@@ -241,7 +241,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    functional::match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -258,7 +258,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    functional::match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -278,7 +278,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    functional::match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -312,10 +312,10 @@ int main()
   }
 #endif
   {
-    // functional::match functional::select<types<>>(a)
+    // match functional::select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = make_tagged<t1>(1);
-    functional::match<void>(functional::select<functional::tags<t1>>(a),
+    match<void>(functional::select<functional::tags<t1>>(a),
         [](tagged<int, t1> i)
         {
         },
@@ -327,7 +327,7 @@ int main()
   }
   {
     boost::any a = make_tagged<t2>("a");
-    functional::match<void>(functional::select<functional::tags<t1,t2>>(a),
+    match<void>(functional::select<functional::tags<t1,t2>>(a),
         [](tagged<int, t1> i)
         {
           BOOST_TEST(false);
@@ -399,7 +399,7 @@ int main()
   {
     int i;
     boost::any a = make_tagged<t3>(i);
-    functional::match<void>(functional::select<functional::tags<t3>>(a),
+    match<void>(functional::select<functional::tags<t3>>(a),
         [](tagged<int&, t3> i)
         {
         },
@@ -417,7 +417,7 @@ int main()
   {
     int i;
     boost::any a = make_tagged<t4>(&i);
-    functional::match<void>(functional::select<functional::tags<t4>>(a),
+    match<void>(functional::select<functional::tags<t4>>(a),
         [](tagged<int*, t4> i)
         {
         },
