@@ -12,7 +12,7 @@
 #include <tags/v0/config.hpp>
 
 namespace tags {
-  CONFIG_INLINE_NAMESPACE(v0) {
+  TAGS_INLINE_NAMESPACE(v0) {
 
     template< class Type, class Tag >
     struct tagged

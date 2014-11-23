@@ -6,18 +6,23 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef META_V0_TYPES_HPP
-#define META_V0_TYPES_HPP
+#ifndef YAFPL_V1_META_TYPE_HPP
+#define YAFPL_V1_META_TYPE_HPP
 
-#include <meta/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
 
-namespace meta {
-  CONFIG_INLINE_NAMESPACE(v0) {
+namespace yafpl
+{
+YAFPL_INLINE_NAMESPACE(v1)
+{
+  namespace meta
+  {
 
-    template < class ...Ts >
-    struct types {};
+    template < class T >
+    struct type
+    {};
 
   }
 }
-
+}
 #endif // header

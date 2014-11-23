@@ -6,10 +6,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <data_type/v0/match_variant.hpp>
-#include <functional/v0/match.hpp>
-#include <functional/v0/tags.hpp>
-#include <functional/v0/select.hpp>
+#include <yafpl/v1/data_type/match_variant.hpp>
+#include <yafpl/v1/functional/match.hpp>
+#include <yafpl/v1/functional/tags.hpp>
+#include <yafpl/v1/functional/select.hpp>
 
 #include <string>
 #include <functional>
@@ -28,7 +28,7 @@ struct t3
 struct t4
 {};
 
-namespace functional
+namespace yafpl
 {
   template<>
   struct tag_type<t1>
@@ -56,8 +56,8 @@ struct X{};
 
 int main()
 {
-  using namespace meta;
-  using namespace functional;
+  using namespace yafpl;
+  using namespace yafpl::meta;
   {
     boost::variant<int, X> a = 2;
     match<void>(a,
@@ -297,7 +297,7 @@ int main()
   }
 //  {
 //    boost::any a = make_tagged<t2>("a");
-//    match<void>(functional::select<functional::tags<t1,t2>>(a),
+//    match<void>(select<tags<t1,t2>>(a),
 //        [](tagged<int, t1> i)
 //        {
 //          BOOST_TEST(false);
@@ -314,7 +314,7 @@ int main()
 //  {
 //    boost::any ta = make_tagged<t1>(1);
 //    boost::any tb = make_tagged<t2>(std::string("2"));
-//    match_all<void>(std::make_tuple(select<functional::tags<t1, t2>>(ta), select<functional::tags<t1, t2>>(tb)),
+//    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
 //        [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
 //        {
 //          BOOST_TEST(false);
@@ -344,7 +344,7 @@ int main()
 //  {
 //    boost::any ta = make_tagged<t1>(1);
 //    boost::any tb = make_tagged<t2>(std::string("2"));
-//    match_all<void>(std::make_tuple(select<functional::tags<t1, t2>>(ta), select<functional::tags<t1, t2>>(tb)),
+//    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
 //        [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
 //        {
 //          BOOST_TEST(false);
@@ -369,7 +369,7 @@ int main()
 //  {
 //    int i;
 //    boost::any a = make_tagged<t3>(i);
-//    match<void>(functional::select<functional::tags<t3>>(a),
+//    match<void>(select<tags<t3>>(a),
 //        [](tagged<int&, t3> i)
 //        {
 //        },
@@ -387,7 +387,7 @@ int main()
 //  {
 //    int i;
 //    boost::any a = make_tagged<t4>(&i);
-//    match<void>(functional::select<functional::tags<t4>>(a),
+//    match<void>(select<tags<t4>>(a),
 //        [](tagged<int*, t4> i)
 //        {
 //        },

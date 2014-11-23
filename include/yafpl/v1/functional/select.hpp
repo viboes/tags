@@ -6,18 +6,19 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUNCTIONAL_V0_SELECT_HPP
-#define FUNCTIONAL_V0_SELECT_HPP
+#ifndef YAFPL_V1_FUNCTIONAL_SELECT_HPP
+#define YAFPL_V1_FUNCTIONAL_SELECT_HPP
 
-#include <tags/v0/config.hpp>
-#include <meta/v0/none.hpp>
-#include <meta/v0/types.hpp>
+#include <yafpl/v1/config.hpp>
+
+#include <yafpl/v1/meta/none.hpp>
+#include <yafpl/v1/meta/types.hpp>
 
 #include <utility>
 #include <type_traits>
 
-namespace functional {
-  CONFIG_INLINE_NAMESPACE(v0) {
+namespace yafpl {
+  YAFPL_INLINE_NAMESPACE(v1) {
 
     template < class T, class Types >
     struct selector;

@@ -6,7 +6,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <data_type/v0/maybe.hpp>
+#include <yafpl/v1/data_type/maybe.hpp>
 
 #include <string>
 #include <functional>
@@ -17,9 +17,9 @@ struct X{};
 
 int main()
 {
-  using namespace meta;
-  using namespace functional;
-  using namespace data_type;
+  using namespace yafpl;
+  using namespace yafpl::meta;
+
   {
     BOOST_TEST_EQ(true, just(2) == just(2));
     maybe<int> a = just(2);

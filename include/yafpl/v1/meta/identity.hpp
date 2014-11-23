@@ -6,18 +6,25 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef META_V0_IDENTITY_HPP
-#define META_V0_IDENTITY_HPP
+#ifndef YAFPL_V1_META_IDENTITY_HPP
+#define YAFPL_V1_META_IDENTITY_HPP
 
-#include <meta/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
 
-namespace meta {
-  CONFIG_INLINE_NAMESPACE(v0) {
-
+namespace yafpl
+{
+YAFPL_INLINE_NAMESPACE(v1)
+{
+  namespace meta
+  {
     template <typename T>
-    struct identity { using type = T; };
+    struct identity
+    {
+      using type = T;
+    };
 
   }
+}
 }
 
 #endif // header

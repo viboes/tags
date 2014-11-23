@@ -6,16 +6,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUCTIONAL_V0_APPLY_HPP
-#define FUCTIONAL_V0_APPLY_HPP
+#ifndef YAFPL_FUCTIONAL_V1_APPLY_HPP
+#define YAFPL_FUCTIONAL_V1_APPLY_HPP
 
-#include <functional/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
+
 #include <utility>
 #include <type_traits>
 #include <tuple>
 
-namespace functional {
-  CONFIG_INLINE_NAMESPACE(v0) {
+namespace yafpl {
+  YAFPL_INLINE_NAMESPACE(v1) {
 
     namespace detail {
 

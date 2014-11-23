@@ -6,25 +6,25 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUCTIONAL_V0_MATCH_HPP
-#define FUCTIONAL_V0_MATCH_HPP
+#ifndef YAFPL_FUCTIONAL_V0_MATCH_HPP
+#define YAFPL_FUCTIONAL_V0_MATCH_HPP
 
-#include <functional/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
 
-#include <functional/v0/apply.hpp>
-#include <functional/v0/overload.hpp>
-#include <meta/v0/identity.hpp>
-#include <meta/v0/none.hpp>
-#include <meta/v0/types.hpp>
+#include <yafpl/v1/functional/apply.hpp>
+#include <yafpl/v1/functional/overload.hpp>
+#include <yafpl/v1/meta/identity.hpp>
+#include <yafpl/v1/meta/none.hpp>
+#include <yafpl/v1/meta/types.hpp>
 
 #include <utility>
 #include <type_traits>
 #include <tuple>
 
-namespace functional
+namespace yafpl
 {
 
-  CONFIG_INLINE_NAMESPACE(v0)
+  YAFPL_INLINE_NAMESPACE(v1)
   {
 
     using meta::types;
@@ -93,11 +93,11 @@ namespace functional
           overload(
               [&](auto *r)
               {
-                *r = functional::apply(this->fct, std::move(odts));
+                *r = apply(this->fct, std::move(odts));
               },
               [&](void *)
               {
-                functional::apply(this->fct, std::move(odts));
+                apply(this->fct, std::move(odts));
               }
           )(this->r);
         }
@@ -142,7 +142,7 @@ namespace functional
       };
 
       template <class R, class F, class ST, class... STs>
-      decltype(auto) apply(F &&fct, ST const& sum, STs const&... osts)
+      decltype(auto) apply_impl(F &&fct, ST const& sum, STs const&... osts)
       {
         struct applier_type : applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_types_t<ST> >
         {
@@ -161,21 +161,21 @@ namespace functional
     template <class R, class ST, class... Fs>
     decltype(auto) match(ST const& that, Fs &&... fcts)
     {
-      return detail::apply<R>(overload(std::forward<Fs>(fcts)...), that);
+      return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), that);
     }
 
     template <class R, class... STs, class... Fs>
     decltype(auto) match_all(std::tuple<STs...> const& those, Fs &&... fcts)
     {
-      return functional::apply(
+      return apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply<R>(overload(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
+            return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
           },
           those);
     }
 
-  } // v0
-} // functional
+  } // version
+} // yafpl
 
 #endif // header

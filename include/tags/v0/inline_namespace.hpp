@@ -11,10 +11,10 @@
 #ifndef TAGS_V0_INLINE_NAMESPACE_HPP
 #define TAGS_V0_INLINE_NAMESPACE_HPP
 
-#include <config/inline_namespace.hpp>
+#include <tags/v0/config/inline_namespace.hpp>
 
 namespace tags {
-  CONFIG_DCL_INLINE_NAMESPACE(v0)
+  TAGS_DCL_INLINE_NAMESPACE(v0)
 }
 
 #endif // header

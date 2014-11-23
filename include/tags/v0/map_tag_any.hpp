@@ -12,7 +12,7 @@
 #include <tags/v0/config.hpp>
 #include <tags/v0/tagged.hpp>
 #include <tags/v0/tag.hpp>
-#include <meta/v0/types.hpp>
+#include <yafpl/v1/meta/types.hpp>
 
 #include <boost/any.hpp>
 
@@ -20,9 +20,9 @@
 #include <map>
 
 namespace tags {
-  CONFIG_INLINE_NAMESPACE(v0) {
+  TAGS_INLINE_NAMESPACE(v0) {
 
-    using meta::types;
+    using yafpl::meta::types;
 
     /// @c map_tag_any is a kind of map mapping types to any
     /// This is simmilar to a tagged @c fusion::tuple, but having a variadic number of elements.

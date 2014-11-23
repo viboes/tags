@@ -6,10 +6,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef META_V0_CONFIG_HPP
-#define META_V0_CONFIG_HPP
+#ifndef YAFPL_V1_CONFIG_HPP
+#define YAFPL_V1_CONFIG_HPP
 
 #include <boost/config.hpp>
-#include <config/inline_namespace.hpp>
+
+#include <yafpl/v1/config/inline_namespace.hpp>
+
+namespace yafpl {
+  YAFPL_DCL_INLINE_NAMESPACE(v1)
+}
 
 #endif // header

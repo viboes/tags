@@ -6,16 +6,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUCTIONAL_V0_OVERLOAD_HPP
-#define FUCTIONAL_V0_OVERLOAD_HPP
+#ifndef YAFPL_FUCTIONAL_V1_OVERLOAD_HPP
+#define YAFPL_FUCTIONAL_V1_OVERLOAD_HPP
 
-#include <functional/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
+
 #include <utility>
 #include <type_traits>
 
-namespace functional
+namespace yafpl
 {
-  CONFIG_INLINE_NAMESPACE(v0)
+  YAFPL_INLINE_NAMESPACE(v1)
   {
 
     namespace detail
@@ -94,7 +95,7 @@ namespace functional
       return detail::overloader_ret<R, std::decay_t<Fs>...>(std::forward<Fs>(fcts)...);
     }
 
-  } // v0
-} // functional
+  } // version
+} // yafpl
 
 #endif // header

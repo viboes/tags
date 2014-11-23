@@ -14,7 +14,7 @@
 #include <typeindex>
 
 namespace tags {
-  CONFIG_INLINE_NAMESPACE(v0) {
+  TAGS_INLINE_NAMESPACE(v0) {
 
     /// An absolute tag has associated two informations available at compile time
     ///   * The type associated to a tag know at compile time. To do so the user must specialize the tag_type struct.

@@ -6,16 +6,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUNCTIONAL_V0_TAGS_HPP
-#define FUNCTIONAL_V0_TAGS_HPP
+#ifndef YAFPL_V1_FUNCTIONAL_TAGS_HPP
+#define YAFPL_V1_FUNCTIONAL_TAGS_HPP
 
-#include <functional/v0/config.hpp>
-#include <meta/v0/types.hpp>
+#include <yafpl/v1/config.hpp>
+
+#include <yafpl/v1/meta/types.hpp>
 
 #include <utility>
 
-namespace functional {
-  CONFIG_INLINE_NAMESPACE(v0) {
+namespace yafpl {
+  YAFPL_INLINE_NAMESPACE(v1) {
 
     /// An absolute tag has associated two informations available at compile time
     ///   * The type associated to a tag know at compile time. To do so the user must specialize the tag_type struct.

@@ -6,18 +6,21 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef META_V0_NONE_HPP
-#define META_V0_NONE_HPP
+#ifndef YAFPL_V1_META_NONE_HPP
+#define YAFPL_V1_META_NONE_HPP
 
-#include <meta/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
 
-namespace meta {
-  CONFIG_INLINE_NAMESPACE(v0) {
-
-    struct none_t {};
-    constexpr none_t none = {};
-
+namespace yafpl
+{
+YAFPL_INLINE_NAMESPACE(v1)
+{
+  namespace meta
+  {
+    struct none_t    {};
+    constexpr none_t none =    {};
   }
+}
 }
 
 #endif // header

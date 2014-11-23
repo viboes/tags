@@ -12,17 +12,16 @@
 #include <tags/v0/config.hpp>
 #include <tags/v0/tagged.hpp>
 #include <tags/v0/tag.hpp>
-#include <meta/v0/types.hpp>
-#include <functional/v0/overload.hpp>
+#include <yafpl/v1/meta/types.hpp>
 
 #include <boost/any.hpp>
 
 #include <typeindex>
 
 namespace tags {
-  CONFIG_INLINE_NAMESPACE(v0) {
+  TAGS_INLINE_NAMESPACE(v0) {
 
-    using meta::types;
+    using yafpl::meta::types;
 
     struct tag_any {
       std::type_index index;

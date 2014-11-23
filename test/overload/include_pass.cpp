@@ -6,16 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <functional/v0/overload.hpp>
+#include <yafpl/v1/functional/overload.hpp>
 
 #include <boost/detail/lightweight_test.hpp>
 
-
-
-
 int main()
 {
-  using namespace functional;
+  using namespace yafpl;
   {
     int i = overload(
         [](int i)

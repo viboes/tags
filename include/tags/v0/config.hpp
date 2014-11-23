@@ -10,6 +10,6 @@
 #define TAGS_V0_CONFIG_HPP
 
 #include <boost/config.hpp>
-#include <config/inline_namespace.hpp>
+#include <tags/v0/config/inline_namespace.hpp>
 
 #endif // header

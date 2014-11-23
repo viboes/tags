@@ -6,14 +6,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FUNCTIONAL_V0_PATTERN_HPP
-#define FUNCTIONAL_V0_PATTERN_HPP
+#ifndef YAFPL_V1_FUNCTIONAL_PATTERN_HPP
+#define YAFPL_V1_FUNCTIONAL_PATTERN_HPP
 
-#include <functional/v0/config.hpp>
+#include <yafpl/v1/config.hpp>
 #include <utility>
 
-namespace functional {
-  CONFIG_INLINE_NAMESPACE(v0) {
+namespace yafpl {
+  YAFPL_INLINE_NAMESPACE(v1) {
 
     template< class Type, class Tag >
     struct pattern_t
@@ -92,7 +92,6 @@ namespace functional {
 
     };
 
-
     template< class Tag, class Type >
     pattern_t<Type, Tag> pattern(Type && x)
     {
@@ -106,15 +105,15 @@ namespace functional {
   }
 }
 
-#define FUNCTIONAL_V0_NEWTYPE(name) \
+#define YAFPL_NEWTYPE(name) \
     struct BOOST_JOIN(name,_) {}; \
-    using BOOST_JOIN(name,_t)  = ::functional::pattern_t<void, BOOST_JOIN(name,_)>; \
+    using BOOST_JOIN(name,_t)  = ::yafpl::v1::pattern_t<void, BOOST_JOIN(name,_)>; \
     constexpr BOOST_JOIN(name,_t) name = {}
 
-#define FUNCTIONAL_V0_NEWTYPE_1(name) \
+#define YAFPL_NEWTYPE_1(name) \
     struct BOOST_JOIN(name,_) {}; \
     template <class T> \
-    using BOOST_JOIN(name,_t)  = ::functional::pattern_t<T, BOOST_JOIN(name,_)>; \
+    using BOOST_JOIN(name,_t)  = ::yafpl::v1::pattern_t<T, BOOST_JOIN(name,_)>; \
     template <class T> \
     constexpr BOOST_JOIN(name,_t)<T> name(T&& x) { return BOOST_JOIN(name,_t)<T>(std::forward<T>(x)); } \
     inline constexpr BOOST_JOIN(name,_t)<void> name() { return BOOST_JOIN(name,_t)<void>(); }
