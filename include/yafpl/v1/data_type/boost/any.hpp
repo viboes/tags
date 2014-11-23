@@ -6,9 +6,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef YAFPL_V1_DATA_TYPE_MAYBE_MAYBE_HPP
-#define YAFPL_V1_DATA_TYPE_MAYBE_MAYBE_HPP
+#ifndef YAFPL_V1_DATA_TYPE_BOOST_ANY_HPP
+#define YAFPL_V1_DATA_TYPE_BOOST_ANY_HPP
 
-#include <yafpl/v1/data_type/maybe/maybe.hpp>
+#include <yafpl/v1/data_type/boost/any/match_any.hpp>
 
 #endif // header
