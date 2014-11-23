@@ -25,6 +25,38 @@ namespace functional {
       explicit constexpr pattern_t(Type && v) : value(std::move(v)) {}
 
       value_type value;
+
+      friend constexpr bool operator==(pattern_t const& x, pattern_t const y)
+          // requires EQ<Type>
+      {
+        return x.value == y.value;
+      }
+      friend constexpr bool operator!=(pattern_t const& x, pattern_t const y)
+          // requires EQ<Type>
+      {
+        return x.value != y.value;
+      }
+      friend constexpr bool operator<(pattern_t const& x, pattern_t const y)
+          // requires Ord<Type>
+      {
+        return x.value < y.value;
+      }
+      friend constexpr bool operator<=(pattern_t const& x, pattern_t const y)
+          // requires Ord<Type>
+      {
+        return x.value <= y.value;
+      }
+      friend constexpr bool operator>(pattern_t const& x, pattern_t const y)
+          // requires Ord<Type>
+      {
+        return x.value > y.value;
+      }
+      friend constexpr bool operator>=(pattern_t const& x, pattern_t const y)
+          // requires Ord<Type>
+      {
+        return x.value >= y.value;
+      }
+
     };
 
     template< class Tag >
@@ -33,7 +65,33 @@ namespace functional {
       typedef void value_type;
       typedef Tag tag_type;
 
+      friend constexpr bool operator==(pattern_t const& x, pattern_t const y)
+      {
+        return true;
+      }
+      friend constexpr bool operator!=(pattern_t const& x, pattern_t const y)
+      {
+        return false;
+      }
+      friend constexpr bool operator<(pattern_t const& x, pattern_t const y)
+      {
+        return false;
+      }
+      friend constexpr bool operator<=(pattern_t const& x, pattern_t const y)
+      {
+        return true;
+      }
+      friend constexpr bool operator>(pattern_t const& x, pattern_t const y)
+      {
+        return false;
+      }
+      friend constexpr bool operator>=(pattern_t const& x, pattern_t const y)
+      {
+        return true;
+      }
+
     };
+
 
     template< class Tag, class Type >
     pattern_t<Type, Tag> pattern(Type && x)
@@ -60,5 +118,7 @@ namespace functional {
     template <class T> \
     constexpr BOOST_JOIN(name,_t)<T> name(T&& x) { return BOOST_JOIN(name,_t)<T>(std::forward<T>(x)); } \
     inline constexpr BOOST_JOIN(name,_t)<void> name() { return BOOST_JOIN(name,_t)<void>(); }
+
+
 
 #endif // header

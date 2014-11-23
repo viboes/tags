@@ -21,6 +21,37 @@ int main()
   using namespace functional;
   using namespace data_type;
   {
+    BOOST_TEST_EQ(true, just(2) == just(2));
+    maybe<int> a = just(2);
+    maybe<int> b = just(2);
+    BOOST_TEST_EQ(true, a == b);
+    BOOST_TEST_EQ(false, a != b);
+  }
+  {
+    maybe<int> a = just(2);
+    maybe<int> b = just(3);
+    BOOST_TEST_EQ(false, a == b);
+    BOOST_TEST_EQ(true, a != b);
+  }
+  {
+    maybe<int> a = nothing;
+    maybe<int> b = nothing;
+    BOOST_TEST_EQ(true, a == b);
+    BOOST_TEST_EQ(false, a != b);
+  }
+  {
+    maybe<int> a = nothing;
+    maybe<int> b = just(2);
+    BOOST_TEST_EQ(false, a == b);
+    BOOST_TEST_EQ(true, a != b);
+  }
+  {
+    maybe<int> a = just(2);
+    maybe<int> b = nothing;
+    BOOST_TEST_EQ(false, a == b);
+    BOOST_TEST_EQ(true, a != b);
+  }
+  {
     maybe<int> a = just(2);
     match<void>(a,
         [](just_t<int> i)
