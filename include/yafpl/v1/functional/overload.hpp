@@ -11,8 +11,9 @@
 
 #include <yafpl/v1/config.hpp>
 
-#include <utility>
+#include <functional>
 #include <type_traits>
+#include <utility>
 
 namespace yafpl
 {
@@ -23,76 +24,113 @@ namespace yafpl
     {
       using namespace std;
 
-      template <class... Fs>
-      struct overloader;
-
       template <class F>
-      struct overloader<F> : F
+      struct forwarder : F
       {
         using F::operator();
-        overloader(F fct) : F(move(fct))
+        constexpr forwarder(F fct) : F(move(fct))
         {}
       };
 
-      template <class F, class... Fs>
-      struct overloader<F, Fs...>
-      : F, overloader<Fs...>
-      {
-        using base_type = overloader<Fs...>;
-        using F::operator();
-        using base_type::operator();
-        overloader(F fct, Fs... fcts)
-        : F(move(fct)),
-        base_type(move(fcts)...)
-        {}
+      template< class R, class ...X >
+      struct forwarder<R(*)(X...)> {
+          using type = R(*)(X...);
+          type f;
+
+          constexpr forwarder(type f) : f(f) { }
+
+          constexpr R operator () (X &&... x) const {
+              return f(std::forward<X>(x)...);
+          }
       };
 
-      ///
-      template <class R, class... Fs>
-      struct overloader_ret : overloader<Fs ...>
+      template<class R, class O, class...X>
+      struct forwarder<R(O::*)(X...)> : forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))> {
+        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))>;
+        using type = R(O::*)(X...);
+
+        constexpr forwarder(type f) : base(std::mem_fn(f)) { }
+        using base::operator();
+      };
+
+      template <class R, class F>
+      struct explicit_forwarder : F
       {
         using result_type = R;
-        overloader_ret(Fs... fcts) : overloader<Fs ...>(std::forward<Fs>(fcts)...) {}
+        using F::operator();
+        constexpr explicit_forwarder(F fct) : F(move(fct))
+        {}
+      };
+
+      template< class R, class ...X >
+      struct explicit_forwarder<R, R(X...)> {
+          using result_type = R;
+          using type = R(*)(X...);
+          type f;
+
+          constexpr explicit_forwarder(type f) : f(f) { }
+
+          constexpr R operator () (X &&... x) const {
+              return f(std::forward<X>(x)...);
+          }
+      };
+
+      template<class R, class O, class...X>
+      struct explicit_forwarder<R, R(O::*)(X...)> : explicit_forwarder<R, decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))> {
+        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))>;
+        using type = R(O::*)(X...);
+
+        constexpr explicit_forwarder(type f) : base(std::mem_fn(f)) { }
+        using base::operator();
+      };
+
+      template <class F, class G>
+      struct overloader
+      : forwarder<F>, forwarder<G>
+      {
+        using forwarder<F>::operator();
+        using forwarder<G>::operator();
+
+        constexpr overloader(F&& f, G&& g)
+        : forwarder<F>(move(f)),
+          forwarder<G>(move(g))
+        {}
       };
 
       ///
-//      template <class R, class... Fs>
-//      struct overloader;
-//
-//      template <class R, class F>
-//      struct overloader<R, F> : F
-//      {
-//        using result_type = R;
-//        using F::operator();
-//        overloader(F fct) : F(move(fct))
-//        {}
-//      };
-//
-//      template <class R, class F, class... Fs>
-//      struct overloader<R, F, Fs...>
-//      : F, overloader<R, Fs...>
-//      {
-//        using base_type = overloader<R, Fs...>;
-//        using F::operator();
-//        using base_type::operator();
-//        overloader(F fct, Fs... fcts)
-//        : F(move(fct)),
-//        base_type(move(fcts)...)
-//        {}
-//      };
+      template <class R, class F, class G>
+      struct explicit_overloader : overloader<F, G>
+      {
+        using result_type = R;
+        explicit_overloader(F&& f, G&& g) : overloader<F, G>(std::forward<F>(f), std::forward<G>(g)) {}
+      };
 
     } // detail
 
-    template <class ... Fs>
-    auto overload(Fs &&... fcts)
+    template <class F>
+    auto overload(F && f)
     {
-      return detail::overloader<std::decay_t<Fs>...>(std::forward<Fs>(fcts)...);
+      return std::forward<F>(f);
     }
 
-    template <class R, class ... Fs>
-    auto explicit_overload(Fs &&... fcts)
+    template <class F1, class F2, class ... Fs, class F12= detail::overloader<std::decay_t<F1>,std::decay_t<F2>> >
+    auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
     {
-      return detail::overloader_ret<R, std::decay_t<Fs>...>(std::forward<Fs>(fcts)...);
+      return overload(F12(std::forward<F1>(f1), std::forward<F2>(f2)),
+                      std::forward<Fs>(fcts)...);
+    }
+
+    template <class R, class F>
+    auto explicit_overload(F && f)
+    {
+      return detail::explicit_forwarder<R, F>(f, std::forward<F>(f));
+    }
+
+    template <class R, class F1, class F2, class ... Fs, class F12= detail::explicit_overloader<R, std::decay_t<F1>,std::decay_t<F2>> >
+    auto explicit_overload(F1 && f1, F2 && f2, Fs &&... fcts)
+    {
+      return explicit_overload<R>(F12(std::forward<F1>(f1), std::forward<F2>(f2)),
+                      std::forward<Fs>(fcts)...);
     }
 
   } // version
