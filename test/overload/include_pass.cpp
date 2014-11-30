@@ -101,7 +101,7 @@ int main()
     BOOST_TEST(f(x, 'c') == x);
     BOOST_TEST_EQ(f(Y{}), -1);
   }
-  return 1+boost::report_errors();
+  return boost::report_errors();
 }
 
 
