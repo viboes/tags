@@ -6,10 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef YAFPL_V1_DATA_TYPE_MAYBE_HPP
-#define YAFPL_V1_DATA_TYPE_MAYBE_HPP
+#ifndef META_V0_META_HPP
+#define META_V0_META_HPP
 
-#include <yafpl/v1/data_type/maybe/maybe.hpp>
-#include <yafpl/v1/data_type/maybe/monad.hpp>
+#include <meta/v0/identity.hpp>
+#include <meta/v0/none.hpp>
+#include <meta/v0/type.hpp>
+#include <meta/v0/types.hpp>
+
 
 #endif // header

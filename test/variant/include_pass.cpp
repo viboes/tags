@@ -6,7 +6,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <yafpl/v1/data_type/match_variant.hpp>
+#include <yafpl/v1/data_type/boost/variant.hpp>
 #include <yafpl/v1/functional/match.hpp>
 #include <yafpl/v1/functional/tags.hpp>
 #include <yafpl/v1/functional/select.hpp>

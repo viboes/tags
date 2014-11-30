@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef YAFPL_V1_DATA_TYPE_MATCH_VARIANT_HPP
-#define YAFPL_V1_DATA_TYPE_MATCH_VARIANT_HPP
+#ifndef YAFPL_V1_DATA_TYPE_BOOST_VARIANT_MATCH_VARIANT_HPP
+#define YAFPL_V1_DATA_TYPE_BOOST_VARIANT_MATCH_VARIANT_HPP
 
 #include <yafpl/v1/config.hpp>
 #include <yafpl/v1/meta/type.hpp>
