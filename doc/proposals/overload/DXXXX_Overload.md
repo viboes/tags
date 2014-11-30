@@ -64,6 +64,15 @@ The `overload` function when there are only two parameters can be defined as fol
 
 # Design rationale
 
+## Which kind of functions would overload accept
+
+The previous definition of overload is quite simple, however it doesn't accept member 
+functions, as std::bind does.
+
+
+As there is no major problem implementing it and that this inclusion doesn't degrade the 
+performances, we opt to include them also. 
+
 ## Binary or variadic interface
 
 We could either provide a binary or a variadic `overload` function. 
@@ -80,7 +89,7 @@ We could either provide a binary or a variadic `overload` function.
 The binary function needs to repeat the overload word for each new overloaded function.
 
 
-We think that the variadic version is not much more complex to implement and make user 
+We think that the variadic version is not much more complex to implement and makes user 
 code simpler.
 
 
@@ -93,22 +102,21 @@ function object is copyable.
 
 ## Result type of `overload`
 
-The proposed `overload` function doesn't adds any contraint on the result type of the overloaded functions.
+The proposed `overload` function doesn't adds any contraint on the result type of the 
+overloaded functions. The result type depends on the one of the overloaded function.
 
 We can consider 3 other alternatives:
 
-* let the function object just return the type returned by each overload,
 * explicit return type `R`: the result type is `R` and the result type of the overloads must be explicitly convertible to `R`,
 * `common_type`: the result type is the `common_type` of the result of the overloads,
 * `variant`: the result type is the `variant` of the unique result types of the overloads
 
-Each one of these alternatives needs a specific interface:
+Each one of these alternatives would needs a specific interface:
 
 * `overload`
 * `explicit_overload`
 * `common_type_overload`
 * `variant_overload`
-
 
 For a sake of simplicity this proposal only contains the `overload` version.
 
