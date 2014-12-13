@@ -112,7 +112,7 @@ namespace yafpl
           };
 
           // customization point
-          match(type<R>{}, type<ST>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
+          match(type<R>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
         }
 
         template <size_t... i, size_t... j, size_t... k>
@@ -152,7 +152,7 @@ namespace yafpl
 
         storage<R> r;
         // customization point
-        match(type<R>{}, type<ST>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+        match(type<R>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
         return std::move(r).get();
       }
 

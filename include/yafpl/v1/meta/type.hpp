@@ -20,7 +20,9 @@ YAFPL_INLINE_NAMESPACE(v1)
 
     template < class T >
     struct type
-    {};
+    {
+      using underlying_type = T;
+    };
 
   }
 }

@@ -39,8 +39,8 @@ YAFPL_INLINE_NAMESPACE(v1)
   {
     ::boost::variant< nothing_t, just_t<T> > data;
 
-    template <class R, class T1, class F>
-    friend R match(meta::type<R>, meta::type<maybe<T1>>, maybe<T> const& x, F&& f)
+    template <class R, class F>
+    friend R match(meta::type<R>, maybe<T> const& x, F&& f)
     {
       return match<R>(x.data, std::forward<F>(f));
     }
