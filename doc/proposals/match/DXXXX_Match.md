@@ -44,7 +44,7 @@ customized the following overloaded function
 
 ```c++
           temaplate <class R, class F>
-          match(type<R>, type<ST>, ST const&, F&& );
+          match(type<R>, ST const&, F&& );
 ```
 
 where the `type` is just a tag class used to make unambiguous the overload.
@@ -55,7 +55,7 @@ For example, we could customize `boost::variant`as follows:
 ```c++
     namespace boost {
           temaplate <class R, class F, class ...Ts >
-          match(type<R>, type<variant<Ts...>>, variant<Ts...> const& v, F&& f) 
+          match(type<R>, variant<Ts...> const& v, F&& f) 
           { return v.visit(std::forward<F>(f)); }
     }
 ```
@@ -149,10 +149,10 @@ The customization point
 
 ```c++
           temaplate <class R, class F>
-          match(type<R>, type<ST>, ST const&, F&& );
+          match(type<R>, ST const&, F&& );
 ```
 
-can be considered unusual, as it contains a parameters type<R> and type<ST>. 
+can be considered unusual, as it contains a parameter type<R>. 
 The type<R> parameter is added to force the return type without inhibiting overload resolution. Calling the customization point
 
 ```c++
@@ -160,8 +160,6 @@ The type<R> parameter is added to force the return type without inhibiting overl
 ```
 
 would not find for overloaded functions.
-
-The second parameter `type<ST>` has been added in order to avoid ambiguous overloads that can be raised as the namespace of `F`
 
 
 ## Grouping with `overload`
