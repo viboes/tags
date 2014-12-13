@@ -105,20 +105,6 @@ function object is copyable.
 The proposed `overload` function doesn't adds any contraint on the result type of the 
 overloaded functions. The result type depends on the one of the overloaded function.
 
-We can consider 3 other alternatives:
-
-* explicit return type `R`: the result type is `R` and the result type of the overloads must be explicitly convertible to `R`,
-* `common_type`: the result type is the `common_type` of the result of the overloads,
-* `variant`: the result type is the `variant` of the unique result types of the overloads
-
-Each one of these alternatives would needs a specific interface:
-
-* `overload`
-* `explicit_overload`
-* `common_type_overload`
-* `variant_overload`
-
-For a sake of simplicity this proposal only contains the `overload` version.
 
 # Technical Specification
 
@@ -147,12 +133,10 @@ inline namespace fundamental_v2
 
 ```
 
-*Requires:* there is a `common_type` of the result of the overloads, which will be the result type of the `overload` function.
-
 *Returns:* A function object that behaves as if all the parameters were overloaded when 
 calling it.
 
-*Thows:* Any exception throw during the construction of the resulting function object.
+*Thows:* Any exception thrown during the construction of the resulting function object.
 
 ## Implementation
 
@@ -160,7 +144,7 @@ There is an implementation of the explicit return type version at https://github
 
 # Acknowledgements 
 
-Many thanks to Matt Calabrese who suggested the `common_type` alternative as the more common. 
+Many thanks to Scott Pager who proposed to add overloads for non-member and member functions. 
 
 # References
 

@@ -85,6 +85,8 @@ inline namespace fundamental_v2
 
 ## Template class `types` 
 
+## Template class `selector` 
+
 ## Template function `select` 
 
 ## Implementation
