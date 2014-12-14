@@ -192,7 +192,7 @@ int main()
   {
     boost::variant<int, X> a = 2;
     boost::variant<int, X> b = 2;
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](int const &i, int const &j )
         {
         },
@@ -209,7 +209,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -226,7 +226,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -246,7 +246,7 @@ int main()
   {
     boost::variant<int, std::string> a = 2;
     boost::variant<int, std::string> b = std::string("2");
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -314,7 +314,7 @@ int main()
 //  {
 //    boost::any ta = make_tagged<t1>(1);
 //    boost::any tb = make_tagged<t2>(std::string("2"));
-//    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
+//    match<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
 //        [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
 //        {
 //          BOOST_TEST(false);
@@ -344,7 +344,7 @@ int main()
 //  {
 //    boost::any ta = make_tagged<t1>(1);
 //    boost::any tb = make_tagged<t2>(std::string("2"));
-//    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
+//    match<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
 //        [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
 //        {
 //          BOOST_TEST(false);

@@ -220,11 +220,11 @@ int main()
     );
   }
   {
-    // match_all select<types<>>(a)
+    // match select<types<>>(a)
     // taking a list of accepted types for this argument.
     boost::any a = 2;
     boost::any b = 2;
-    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int const &i, int const &j )
         {
         },
@@ -241,7 +241,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -258,7 +258,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -278,7 +278,7 @@ int main()
   {
     boost::any a = 2;
     boost::any b = std::string("2");
-    match_all<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
+    match<void>(std::make_tuple(select<types<int, std::string>>(a), select<types<int, std::string>>(b)),
         [](int i, int j )
         {
           BOOST_TEST(false);
@@ -344,7 +344,7 @@ int main()
   {
     boost::any ta = make_tagged<t1>(1);
     boost::any tb = make_tagged<t2>(std::string("2"));
-    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
+    match<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
         [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
         {
           BOOST_TEST(false);
@@ -374,7 +374,7 @@ int main()
   {
     boost::any ta = make_tagged<t1>(1);
     boost::any tb = make_tagged<t2>(std::string("2"));
-    match_all<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
+    match<void>(std::make_tuple(select<tags<t1, t2>>(ta), select<tags<t1, t2>>(tb)),
         [](tagged<int, t1>           const&      i,  tagged<int, t1>         const&        j)
         {
           BOOST_TEST(false);

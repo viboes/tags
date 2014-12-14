@@ -125,7 +125,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = just(2);
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
         },
@@ -139,7 +139,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = nothing;
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
           BOOST_TEST(false);
@@ -156,7 +156,7 @@ int main()
   {
     maybe<int> a = just(2);
     maybe<int> b = nothing;
-    match_all<void>(std::make_tuple(a, b),
+    match<void>(std::make_tuple(a, b),
         [](just_t<int> i, just_t<int> j )
         {
           BOOST_TEST(false);

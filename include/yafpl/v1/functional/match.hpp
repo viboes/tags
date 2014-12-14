@@ -156,16 +156,21 @@ namespace yafpl
         return std::move(r).get();
       }
 
+      template <class T>
+      struct is_tuple : std::false_type {};
+      template <class ...Ts>
+      struct is_tuple<std::tuple<Ts...>> : std::true_type {};
     } // detail
 
-    template <class R, class ST, class... Fs>
+    template <class R, class ST, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value, int>::type = 0>
     decltype(auto) match(ST const& that, Fs &&... fcts)
     {
       return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), that);
     }
 
     template <class R, class... STs, class... Fs>
-    decltype(auto) match_all(std::tuple<STs...> const& those, Fs &&... fcts)
+    decltype(auto) match(std::tuple<STs...> const& those, Fs &&... fcts)
     {
       return apply(
           [&](auto && ... args) -> decltype(auto)
