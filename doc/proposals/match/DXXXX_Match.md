@@ -39,7 +39,7 @@ safer.
 
 ## Customizing the `match` function
 
-The proposed `match` and `match_all` functions work for sum types `ST` that have 
+The proposed `match` function work for sum types `ST` that have 
 customized the following overloaded function
 
 ```c++
@@ -47,7 +47,8 @@ customized the following overloaded function
           match(type<R>, ST const&, F&& );
 ```
 
-where the `type` is just a tag class used to make unambiguous the overload.
+where the `type` is just a tag class used to make unambiguous the overload and simplify 
+the customization.
 
 
 For example, we could customize `boost::variant`as follows: 
@@ -165,7 +166,7 @@ would not find for overloaded functions.
 ## Grouping with `overload`
 
 We can also group all the function with the `overload` function and let the variadic part 
-for the sume types. 
+for the sum types. 
 
 ```c++
     boost::variant<int, X> a = 2;
@@ -221,7 +222,7 @@ inline namespace fundamental_v2
     'see below' match(const ST &that, Fs &&... fcts);
 
     template <class R, class... STs, class... Fs>
-    'see below' match_all(const std::tuple<STs...> &those, Fs &&... fcts);
+    'see below' match(const std::tuple<STs...> &those, Fs &&... fcts);
     
 }
 }
@@ -250,7 +251,7 @@ stored on the sum type as if
 
 ```c++
     template <class R, class... STs, class... Fs>
-    'see below' match_all(const std::tuple<STs...> &those, Fs &&... fcts);   
+    'see below' match(const std::tuple<STs...> &those, Fs &&... fcts);   
 ```
 
 *Returns:* the result of calling the overloaded functions `fcts` depending on the type 
@@ -283,6 +284,7 @@ The authors are working on a proposal to be able to visit on a selected collecti
 ```
 
 We are working also on a `tagged` class that would allow to store the same underlying type but with different tags on `tuple`, `variant` or `any`.
+The user could then use the tags instead of the types to select the visited types.
 
     boost::any a = make_tagged<t1>(1);
     match<void>(select<tags<t1, t2>>(a),
