@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2014-11-17</td>
+        <td width="435">2015-01-25</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -24,7 +24,7 @@ Experimental overload function for C++17.
 
 # Introduction
 
-This paper present a proposal for an `overload` function that allow to overload lambdas 
+This paper presents a proposal for an `overload` function that allow to overload lambdas 
 as well as function or function objects.
 
 
