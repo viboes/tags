@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Date:</td>
-        <td width="435">2014-11-17</td>
+        <td width="435">2015-01-25</td>
     </tr>
     <tr>
         <td width="172" align="left" valign="top">Project:</td>
@@ -24,7 +24,7 @@ Experimental match function for C++17.
 
 # Introduction
 
-This paper present a proposal for two generic `match` function that allow 
+This paper presents a proposal for two generic `match` function that allow 
 to visit sum types individually or by groups.
 
 
@@ -44,7 +44,7 @@ customized the following overloaded function
 
 ```c++
           temaplate <class R, class F>
-          match(type<R>, ST const&, F&& );
+          R match(type<R>, ST const&, F&& );
 ```
 
 where the `type` is just a tag class used to make unambiguous the overload and simplify 
@@ -56,7 +56,7 @@ For example, we could customize `boost::variant`as follows:
 ```c++
     namespace boost {
           temaplate <class R, class F, class ...Ts >
-          match(type<R>, variant<Ts...> const& v, F&& f) 
+          R match(type<R>, variant<Ts...> const& v, F&& f) 
           { return v.visit(std::forward<F>(f)); }
     }
 ```
@@ -240,7 +240,7 @@ inline namespace fundamental_v2
 stored on the sum type as if
 
 ```c++
-    return match(type<R>, type<ST>, that, overload(std::forward<Fs>(fcts)));
+    return match(type<R>, type<ST>, that, overload(std::forward<Fs>(fcts)...));
 ```
 
 *Remarks:* This function will not participate in overload resolution if ST is a tuple type.
@@ -311,6 +311,7 @@ Many thanks to Mat Calabrese who suggested the `common_type` approach.
 
 # References
 
+## DXXXX - Type tag
 ## DXXXX - Overload
 ## DXXXX - Apply
 
