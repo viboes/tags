@@ -4,7 +4,7 @@ Defines `boost::hana::is_a`, `boost::hana::is_an`, and `boost::hana::are`.
 
 Copied from Boost.Hana
 @copyright Louis Dionne 2014
-@copyright Vicente J. Botet Escribe 2014
+@copyright Vicente J. Botet Escriba 2014
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
  */
@@ -78,6 +78,11 @@ YAFPL_INLINE_NAMESPACE(v1)
 
     template <typename Typeclass, typename ...Datatypes>
     constexpr auto is_a = core_detail::is_a_impl(
+        (typename Typeclass::template instance<Datatypes...>*)0
+    );
+
+    template <typename Typeclass, typename ...Datatypes>
+    constexpr auto has_explicit_mapping = core_detail::is_a_impl(
         (typename Typeclass::template instance<Datatypes...>*)0
     );
 

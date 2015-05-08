@@ -4,7 +4,7 @@ Defines `YAFPL_TYPECLASS` and `YAFPL_BINARY_TYPECLASS`.
 
 Copied from Boost.Hana
 @copyright Louis Dionne 2014
-@copyright Vicente J. Botet Escribe 2014
+@copyright Vicente J. Botet Escriba 2014
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
  */
@@ -56,24 +56,28 @@ YAFPL_INLINE_NAMESPACE(v1)
     //!
     //! ### Example
     //! @include example/core/unary_typeclass.cpp
-    #define YAFPL_TYPECLASS(NAME)                                      \
+    #define YAFPL_TYPECLASS(NAME)                                           \
         /** @cond */                                                        \
         template <typename T, typename = void>                              \
         struct instance                                                     \
-            : instance<T, yafpl::when<true>>                        \
+            : instance<T, yafpl::when<true>>                                \
         { };                                                                \
                                                                             \
         template <typename T>                                               \
-        struct instance<T, decltype((void)(typename T::yafpl_ ## NAME*)0)>   \
-            : T::yafpl_ ## NAME                                              \
+        struct instance<T, decltype((void)(typename T::yafpl_ ## NAME*)0)>  \
+            : T::yafpl_ ## NAME                                             \
         { };                                                                \
                                                                             \
         template <typename T, bool condition>                               \
-        struct instance<T, yafpl::when<condition>>                  \
-            : yafpl::core_detail::default_instance<                 \
+        struct instance<T, yafpl::when<condition>>                          \
+            : yafpl::core_detail::default_instance<                         \
                 void, NAME, T                                               \
             >::type                                                         \
-        { }                                                                 \
+        { };                                                                \
+        template <typename T, typename = void>                              \
+        struct instance_data_type                                           \
+            : instance<T>                                                   \
+        { };                                                                \
         /** @endcond */                                                     \
     /**/
 

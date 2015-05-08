@@ -4,7 +4,7 @@ Defines `yafpl::disable`.
 
 Copied from Boost.Hana
 @copyright Louis Dionne 2014
-@copyright Vicente J. Botet Escribe 2014
+@copyright Vicente J. Botet Escriba 2014
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
  */
