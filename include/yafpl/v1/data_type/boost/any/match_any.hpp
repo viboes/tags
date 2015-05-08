@@ -53,7 +53,7 @@ namespace boost
   }
 
   template <class R, class Types, class F>
-  R match(yafpl::meta::type<R>, yafpl::selector<any, Types> const& x, F&& f)
+  R match_custom(yafpl::meta::types<R, yafpl::selector<any, Types>>, yafpl::selector<any, Types> const& x, F&& f)
   {
     return any_detail::match_any<R>(x.value, Types{}, std::forward<F>(f));
   }

@@ -54,7 +54,7 @@ namespace boost
   }
 
   template <class R, class ...Types, class F>
-  R match(yafpl::meta::type<R>, boost::variant<Types...> const& x, F&& f)
+  R match_custom(yafpl::meta::types<R, boost::variant<Types...>>, boost::variant<Types...> const& x, F&& f)
   {
     return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
   }
