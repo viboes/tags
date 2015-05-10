@@ -173,6 +173,14 @@ namespace yafpl
           those);
     }
 
+    namespace meta {
+      template <class R, class T, class F>
+      R match_custom(yafpl::meta::types<R, T>, T const& x, F&& f)
+      {
+        return f(x);
+      }
+    }
+
   } // version
 } // yafpl
 

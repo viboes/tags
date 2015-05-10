@@ -272,6 +272,24 @@ int main()
         }
     );
   }
+  {
+    // todo: this must work.
+    int a = 2;
+    boost::any b = 2;
+    match<void>(std::make_tuple(a, select<types<int, std::string>>(b)),
+        [](int const &i, int const &j )
+        {
+        },
+        [](auto const &i, auto const &j )
+        {
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+
+        }
+    );
+  }
 
 #if 0
   // compile fails
