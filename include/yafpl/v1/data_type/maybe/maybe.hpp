@@ -72,6 +72,10 @@ YAFPL_INLINE_NAMESPACE(v1)
     }
   };
 
+  template <class T>
+  struct sum_types<maybe<T>>: meta::identity<typename maybe<T>::types>
+  {
+  };
 }
 }
 

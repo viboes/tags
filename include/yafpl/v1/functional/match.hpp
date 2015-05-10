@@ -31,7 +31,7 @@ namespace yafpl
     using meta::type;
 
     template <class ST>
-    struct sum_types: meta::identity<typename ST::types>
+    struct sum_types: meta::identity<meta::types<ST>>
     {
     };
 

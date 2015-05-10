@@ -13,6 +13,8 @@
 
 #include <yafpl/v1/meta/none.hpp>
 #include <yafpl/v1/meta/types.hpp>
+#include <yafpl/v1/meta/identity.hpp>
+#include <yafpl/v1/functional/match.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -35,6 +37,10 @@ namespace yafpl {
       return selector<std::decay_t<T>, Types>(v);
     }
 
+    template <class T, class Types>
+    struct sum_types<selector<T, Types>>: meta::identity<Types>
+    {
+    };
   }
 }
 
