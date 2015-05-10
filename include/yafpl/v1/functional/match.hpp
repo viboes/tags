@@ -16,6 +16,7 @@
 #include <yafpl/v1/meta/identity.hpp>
 #include <yafpl/v1/meta/none.hpp>
 #include <yafpl/v1/meta/types.hpp>
+#include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -29,14 +30,6 @@ namespace yafpl
 
     using meta::types;
     using meta::type;
-
-    template <class ST>
-    struct sum_types: meta::identity<meta::types<ST>>
-    {
-    };
-
-    template <class ST>
-    using sum_types_t = typename sum_types<ST>::type;
 
     namespace detail
     {
@@ -105,9 +98,9 @@ namespace yafpl
         template <class... ODTs, class ST, class... OSTs>
         void dispatch_helper(tuple<ODTs const&...> &&odts, ST const& sum, OSTs const&... osts) const
         {
-          struct applier_type : applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_types_t<ST> >
+          struct applier_type : applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_type_alternatives_t<ST> >
           {
-            using super = applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_types_t<ST>>;
+            using super = applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_type_alternatives_t<ST>>;
             using super::super;
           };
 
@@ -144,9 +137,9 @@ namespace yafpl
       template <class R, class F, class ST, class... STs>
       decltype(auto) apply_impl(F &&fct, ST const& sum, STs const&... osts)
       {
-        struct applier_type : applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_types_t<ST> >
+        struct applier_type : applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_type_alternatives_t<ST> >
         {
-          using super = applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_types_t<ST> >;
+          using super = applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_type_alternatives_t<ST> >;
           using super::super;
         };
 

@@ -14,6 +14,7 @@
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/functional/match.hpp>
 #include <yafpl/v1/functional/overload.hpp>
+#include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 
 #include <boost/variant/variant.hpp>
 #include <boost/variant/get.hpp>
@@ -23,7 +24,7 @@
 namespace yafpl
 {
     template <class ...Types>
-    struct sum_types<boost::variant<Types...>> : yafpl::meta::identity<yafpl::meta::types<Types...>> {};
+    struct sum_type_alternatives<boost::variant<Types...>> : yafpl::meta::identity<yafpl::meta::types<Types...>> {};
 };
 
 namespace boost

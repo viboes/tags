@@ -14,7 +14,7 @@
 #include <yafpl/v1/meta/none.hpp>
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/meta/identity.hpp>
-#include <yafpl/v1/functional/match.hpp>
+#include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -38,7 +38,7 @@ namespace yafpl {
     }
 
     template <class T, class Types>
-    struct sum_types<selector<T, Types>>: meta::identity<Types>
+    struct sum_type_alternatives<selector<T, Types>>: meta::identity<Types>
     {
     };
   }

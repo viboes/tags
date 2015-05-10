@@ -21,6 +21,7 @@
 #include <yafpl/v1/functional/pattern.hpp>
 #include <yafpl/v1/meta/type.hpp>
 
+#include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 #include <yafpl/v1/type_class/monad/monad.hpp>
 
 #include <utility>
@@ -73,7 +74,7 @@ YAFPL_INLINE_NAMESPACE(v1)
   };
 
   template <class T>
-  struct sum_types<maybe<T>>: meta::identity<typename maybe<T>::types>
+  struct sum_type_alternatives<maybe<T>>: meta::identity<typename maybe<T>::types>
   {
   };
 }
