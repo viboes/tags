@@ -102,7 +102,7 @@ or we can use the variadic `match` function
     );
 ```
 
-## Using the `match` function to visit one sum type
+## Using the `match` function to visit several sum types
 
 
 The `match` function generalize the visitation for several sum types, e.g. we can 
@@ -130,19 +130,30 @@ visit `variant` and `optional` at once:
 
 ## Result type of `match`
 
-We can consider two alternatives:
+We can consider several alternatives:
 
-* explicit return type `R`: the result type is `R` and the result type of the overloads 
-must be explicitly convertible to `R`,
+* same type : the result type is the type returned by all the functions (must be the same),
 * `common_type`: the result type is the `common_type` of the result of the overloads,
+* `variant` type: the result type is the variant of the types returned by all the functions,
+* explicit type `R`: the result type is `R` and the result type of the overloads 
+must be explicitly convertible to `R`.
+
 
 Each one of these alternatives would needs a specific interface:
 
-* `explicit_match`
+* `same_type_match`
 * `common_type_match`
+* `variant_type_match`
+* `explicit_match`
 
 For a sake of simplicity this proposal only contains a `match` version that uses the 
-explicit return type. The other can be built on top of this version. 
+explicit return type. The other can be built on top of this version:
+
+* `same_type_match` gets the types of the overloaded functions `Ri`, check that all are the same, let call it `R`, and only then calls to the explict `match<R>`,
+* `common_type_match` gets the types of the overloaded functions `Ri`, check that there is a `common_type<Ri...>`, let call it `R`, and only then calls to the explict `match<R>`.
+* `variant_type_match` gets the types of the overloaded functions `Ri`, let `R` be `variant<Ri...>`, and then calls to the explict `match<R>`.
+
+Note that in this way only one customization is needed, independently the type the user wants.
 
 ## Customization point
 
@@ -184,12 +195,12 @@ for the sum types.
         {
             assert(false);
         }
-    ), a, b;
+    ), a, b);
 ```
 
-This has the advantage of having a single of resolving the the problem with a single 
-function. The liability is much a question of style. The author prefer to give the sum 
-types first a,d the overloads later. If we had a language type pattern matching feature it 
+This has the advantage of having resolving the problem with a single function. 
+The liability is much a question of style. The author prefers to give the sum 
+types first `a,d` the overloads later. If we had a language type pattern matching feature it 
 would be much more like
 
 
@@ -206,6 +217,25 @@ would be much more like
     }
 ```
 
+
+An alternativ could be to build first an inspector and the call the the matching overload
+
+    inspect<void>(a, b).match(
+        [](int const &i, int const &j )
+        {
+            //...
+        },
+        [](auto const &i, auto const &j )
+        {
+            assert(false);
+        },
+        [](...)
+        {
+            assert(false);
+        }
+    );
+    
+    
 # Technical Specification
 
 ## Synopsis 
