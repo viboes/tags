@@ -17,8 +17,8 @@
     </tr>
 </table>
 
-C++ generic match function
-=============================
+C++ generic match function for Sum Types
+========================================
 
 Experimental match function for C++17.
 
