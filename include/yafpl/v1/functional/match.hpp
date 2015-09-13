@@ -15,6 +15,7 @@
 #include <yafpl/v1/functional/overload.hpp>
 #include <yafpl/v1/meta/identity.hpp>
 #include <yafpl/v1/meta/none.hpp>
+#include <yafpl/v1/meta/id.hpp>
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 
@@ -29,7 +30,7 @@ namespace yafpl
   {
 
     using meta::types;
-    using meta::type;
+    using meta::id;
 
     namespace detail
     {
@@ -105,7 +106,7 @@ namespace yafpl
           };
 
           // customization point
-          match_custom(types<R,ST>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
+          match_custom(id<R>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
         }
 
         template <size_t... i, size_t... j, size_t... k>
@@ -145,7 +146,7 @@ namespace yafpl
 
         storage<R> r;
         // customization point
-        match_custom(types<R, ST>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+        match_custom(id<R>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
         return std::move(r).get();
       }
 
@@ -175,7 +176,7 @@ namespace yafpl
 
     namespace meta {
       template <class R, class T, class F>
-      R match_custom(yafpl::meta::types<R, T>, T const& x, F&& f)
+      R match_custom(yafpl::meta::id<R>, T const& x, F&& f)
       {
         return f(x);
       }

@@ -10,7 +10,7 @@
 #define YAFPL_V1_DATA_TYPE_BOOST_VARIANT_MATCH_VARIANT_HPP
 
 #include <yafpl/v1/config.hpp>
-#include <yafpl/v1/meta/type.hpp>
+#include <yafpl/v1/meta/id.hpp>
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/functional/match.hpp>
 #include <yafpl/v1/functional/overload.hpp>
@@ -55,7 +55,7 @@ namespace boost
   }
 
   template <class R, class ...Types, class F>
-  R match_custom(yafpl::meta::types<R, boost::variant<Types...>>, boost::variant<Types...> const& x, F&& f)
+  R match_custom(yafpl::meta::id<R>, boost::variant<Types...> const& x, F&& f)
   {
     return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
   }

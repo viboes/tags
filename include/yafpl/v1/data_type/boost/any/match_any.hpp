@@ -10,7 +10,7 @@
 #define YAFPL_V1_DATA_TYPE_BOOST_ANY_MATCH_ANY_HPP
 
 #include <yafpl/v1/config.hpp>
-#include <yafpl/v1/meta/type.hpp>
+#include <yafpl/v1/meta/id.hpp>
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/functional/select.hpp>
 #include <yafpl/v1/functional/overload.hpp>
@@ -53,7 +53,7 @@ namespace boost
   }
 
   template <class R, class Types, class F>
-  R match_custom(yafpl::meta::types<R, yafpl::selector<any, Types>>, yafpl::selector<any, Types> const& x, F&& f)
+  R match_custom(yafpl::meta::id<R>, yafpl::selector<any, Types> const& x, F&& f)
   {
     return any_detail::match_any<R>(x.value, Types{}, std::forward<F>(f));
   }

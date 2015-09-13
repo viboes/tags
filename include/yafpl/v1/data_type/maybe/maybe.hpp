@@ -41,7 +41,7 @@ YAFPL_INLINE_NAMESPACE(v1)
     ::boost::variant< nothing_t, just_t<T> > data;
 
     template <class R, class F>
-    friend R match_custom(meta::types<R, maybe<T>>, maybe<T> const& x, F&& f)
+    friend R match_custom(meta::id<R>, maybe<T> const& x, F&& f)
     {
       return match<R>(x.data, std::forward<F>(f));
     }
