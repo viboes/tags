@@ -102,6 +102,7 @@ namespace yafpl
       struct explicit_overloader : overloader<F, G>
       {
         using result_type = R;
+        using overloader<F, G>::operator();
         explicit_overloader(F&& f, G&& g) : overloader<F, G>(std::forward<F>(f), std::forward<G>(g)) {}
       };
 
@@ -121,15 +122,15 @@ namespace yafpl
     }
 
     template <class R, class F>
-    auto explicit_overload(F && f)
+    auto overload(F && f)
     {
-      return detail::explicit_forwarder<R, F>(f, std::forward<F>(f));
+      return detail::explicit_forwarder<R, F>(std::forward<F>(f));
     }
 
     template <class R, class F1, class F2, class ... Fs, class F12= detail::explicit_overloader<R, std::decay_t<F1>,std::decay_t<F2>> >
-    auto explicit_overload(F1 && f1, F2 && f2, Fs &&... fcts)
+    auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
     {
-      return explicit_overload<R>(F12(std::forward<F1>(f1), std::forward<F2>(f2)),
+      return overload<R>(F12(std::forward<F1>(f1), std::forward<F2>(f2)),
                       std::forward<Fs>(fcts)...);
     }
 
