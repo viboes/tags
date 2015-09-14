@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014.
+// (C) Copyright Vicente J. Botet Escriba 2014-2015.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -18,6 +18,7 @@
 
 #include <boost/variant/variant.hpp>
 #include <boost/variant/get.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 #include <typeindex>
 
@@ -54,11 +55,19 @@ namespace boost
     }
   }
 
+#if ! defined YAFPL_X1
   template <class R, class ...Types, class F>
-  R match_custom(yafpl::meta::id<R>, boost::variant<Types...> const& x, F&& f)
+  R match(yafpl::meta::id<R>, boost::variant<Types...> const& x, F&& f)
   {
     return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
   }
+#else
+  template <class ...Types, class F>
+  auto match(boost::variant<Types...> const& x, F&& f)
+  {
+    return boost::apply_visitor(std::forward<F>(f), x);
+  }
+#endif
 }
 
 #endif // header

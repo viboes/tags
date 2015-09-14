@@ -59,6 +59,28 @@ int main()
     // example
     // taking a list of accepted types for this argument.
     boost::any a = 2;
+    int i = match<int>(select<types<int, std::string>>(a),
+        [](int i)
+        {
+          return 0;
+        },
+        [](std::string const& i)
+        {
+          BOOST_TEST(false);
+          return 1L;
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+          return 2;
+        }
+    );
+    BOOST_TEST(i==0);
+  }
+  {
+    // example
+    // taking a list of accepted types for this argument.
+    boost::any a = 2;
     match<void>(select<types<int, std::string>>(a),
         [](int i)
         {},
@@ -98,7 +120,7 @@ int main()
     match<void>(select<types<std::reference_wrapper<int>>>(a),
         [](std::reference_wrapper<int> i)
         {},
-        [](std::string const& i)
+        [](std::string i)
         {
           BOOST_TEST(false);
         },

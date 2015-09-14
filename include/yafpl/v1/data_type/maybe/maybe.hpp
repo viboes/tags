@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014.
+// (C) Copyright Vicente J. Botet Escriba 2014-2015.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -38,13 +38,16 @@ YAFPL_INLINE_NAMESPACE(v1)
   template <class T>
   class maybe
   {
+  public:
     ::boost::variant< nothing_t, just_t<T> > data;
+#if ! defined YAFPL_X1
+  template <class R, class F>
+  friend R match(meta::id<R>, maybe<T> const& x, F&& f)
+  {
+    return match<R>(x.data, std::forward<F>(f));
+  }
+#endif
 
-    template <class R, class F>
-    friend R match_custom(meta::id<R>, maybe<T> const& x, F&& f)
-    {
-      return match<R>(x.data, std::forward<F>(f));
-    }
   public:
     using types = meta::types<nothing_t, just_t<T>>;
 
@@ -73,10 +76,21 @@ YAFPL_INLINE_NAMESPACE(v1)
     }
   };
 
+
   template <class T>
   struct sum_type_alternatives<maybe<T>>: meta::identity<typename maybe<T>::types>
   {
   };
+
+#if ! defined YAFPL_X1
+#else
+  template <class T, class F>
+  auto match(maybe<T> const& x, F&& f)
+  {
+    return match(x.data, std::forward<F>(f));
+  }
+#endif
+
 }
 }
 

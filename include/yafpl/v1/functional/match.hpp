@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Vicente J. Botet Escriba 2014.
+// (C) Copyright Vicente J. Botet Escriba 2014-2015.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -14,7 +14,6 @@
 #include <yafpl/v1/functional/apply.hpp>
 #include <yafpl/v1/functional/overload.hpp>
 #include <yafpl/v1/meta/identity.hpp>
-#include <yafpl/v1/meta/none.hpp>
 #include <yafpl/v1/meta/id.hpp>
 #include <yafpl/v1/meta/types.hpp>
 #include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
@@ -31,6 +30,14 @@ namespace yafpl
 
     using meta::types;
     using meta::id;
+
+#if defined YAFPL_X1
+    template <class T, class F>
+    auto match(T const& x, F&& f) -> decltype(f(x))
+    {
+      return f(x);
+    }
+#endif
 
     namespace detail
     {
@@ -106,7 +113,11 @@ namespace yafpl
           };
 
           // customization point
-          match_custom(id<R>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
+#if ! defined YAFPL_X1
+          match(id<R>{}, sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
+#else
+          match(sum, applier_type(this->r, this->fct, std::move(odts), std::forward_as_tuple(osts...)));
+#endif
         }
 
         template <size_t... i, size_t... j, size_t... k>
@@ -146,7 +157,11 @@ namespace yafpl
 
         storage<R> r;
         // customization point
-        match_custom(id<R>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+#if ! defined YAFPL_X1
+        match(id<R>{}, sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+#else
+        match(sum, applier_type(r.ptr(), fct, std::forward_as_tuple(), std::forward_as_tuple(osts...)));
+#endif
         return std::move(r).get();
       }
 
@@ -156,12 +171,21 @@ namespace yafpl
       struct is_tuple<std::tuple<Ts...>> : std::true_type {};
     } // detail
 
-    template <class R, class ST, class... Fs, typename std::enable_if<
+#if ! defined YAFPL_X1
+    template <class R, class ST, class F1, class... Fs, typename std::enable_if<
       ! detail::is_tuple<ST>::value, int>::type = 0>
-    decltype(auto) match(ST const& that, Fs &&... fcts)
+    decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
     {
-      return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), that);
+      return detail::apply_impl<R>(overload(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
     }
+#else
+    template <class R, class ST, class F1, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value, int>::type = 0>
+    decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
+    {
+      return detail::apply_impl<R>(overload(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
+    }
+#endif
 
     template <class R, class... STs, class... Fs>
     decltype(auto) match(std::tuple<STs...> const& those, Fs &&... fcts)
@@ -174,13 +198,15 @@ namespace yafpl
           those);
     }
 
+#if ! defined YAFPL_X1
     namespace meta {
       template <class R, class T, class F>
-      R match_custom(yafpl::meta::id<R>, T const& x, F&& f)
+      R match(yafpl::meta::id<R>, T const& x, F&& f)
       {
         return f(x);
       }
     }
+#endif
 
   } // version
 } // yafpl

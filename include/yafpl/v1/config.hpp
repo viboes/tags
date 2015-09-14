@@ -13,6 +13,8 @@
 
 #include <yafpl/v1/config/inline_namespace.hpp>
 
+#define YAFPL_X1
+
 namespace yafpl {
   YAFPL_DCL_INLINE_NAMESPACE(v1)
 }
