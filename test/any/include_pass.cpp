@@ -53,6 +53,46 @@ namespace yafpl
 
 int main()
 {
+  {
+    // todo: this must work.
+    int a = 2;
+    boost::any b = 2;
+    yafpl::match<void>(std::make_tuple(a, yafpl::select<yafpl::types<int, std::string>>(b)),
+        [](int const &i, int const &j )
+        {
+        },
+        [](auto const &i, auto const &j )
+        {
+          BOOST_TEST(false);
+        },
+        [](...)
+        {
+
+        }
+    );
+  }
+  {
+    // example
+    // taking a list of accepted types for this argument.
+    boost::any a = 2;
+    int i = yafpl::match<int>(yafpl::select<yafpl::types<int, std::string>>(a),
+        [](int i)
+        {
+          return 0;
+        },
+        [](std::string const& i)
+        {
+          BOOST_TEST(false);
+          return 1L;
+        },
+        [](...)
+        {
+          BOOST_TEST(false);
+          return 2;
+        }
+    );
+    BOOST_TEST(i==0);
+  }
   using namespace yafpl;
   using namespace yafpl::meta;
   {

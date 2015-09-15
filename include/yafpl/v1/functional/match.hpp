@@ -31,7 +31,13 @@ namespace yafpl
     using meta::types;
     using meta::id;
 
-#if defined YAFPL_X1
+#if ! defined YAFPL_X1
+      template <class R, class T, class F>
+      R match(yafpl::meta::id<R>, T const& x, F&& f)
+      {
+        return f(x);
+      }
+#else
     template <class T, class F>
     auto match(T const& x, F&& f) -> decltype(f(x))
     {
@@ -198,15 +204,6 @@ namespace yafpl
           those);
     }
 
-#if ! defined YAFPL_X1
-    namespace meta {
-      template <class R, class T, class F>
-      R match(yafpl::meta::id<R>, T const& x, F&& f)
-      {
-        return f(x);
-      }
-    }
-#endif
 
   } // version
 } // yafpl
