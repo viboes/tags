@@ -6,8 +6,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef YAFPL_META_V0_TYPES_HPP
-#define YAFPL_META_V0_TYPES_HPP
+#ifndef YAFPL_V1_META_TYPES_HPP
+#define YAFPL_V1_META_TYPES_HPP
 
 #include <yafpl/v1/config.hpp>
 

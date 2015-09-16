@@ -32,7 +32,7 @@ namespace std
 
 #if ! defined YAFPL_X1
     template <class R, class T, class F>
-    R match(meta::id<R>, optional<T> const& x, F&& f)
+    R match(yafpl::meta::id<R>, optional<T> const& x, F&& f)
     {
       if (x)
           return f(*x);
