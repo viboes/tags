@@ -12,6 +12,10 @@ if ! $(BOOST_ROOT)
     BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 }
 
+if ! $(STD_OPTIONAL)
+{
+    STD_OPTIONAL = [ modules.peek : STD_OPTIONAL ] ;
+}
 
 	
 project tags
@@ -19,6 +23,7 @@ project tags
       <include>. # .cpp files in expected/test.
       <include>../include/ # tags .hpp files.
       <include>$(BOOST_ROOT) # boost .hpp files.    
+      <include>$(STD_OPTIONAL) # optional.hpp file.    
 
       <link>static
       <toolset>gcc:<cxxflags>-std=c++11

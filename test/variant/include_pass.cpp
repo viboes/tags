@@ -7,6 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <yafpl/v1/data_type/boost/variant.hpp>
+#include <yafpl/v1/data_type/optional/optional.hpp>
 #include <yafpl/v1/functional/match.hpp>
 #include <yafpl/v1/functional/tags.hpp>
 #include <yafpl/v1/functional/select.hpp>
@@ -239,6 +240,24 @@ int main()
           BOOST_TEST(false);
         }
     );
+  }
+  {
+    boost::variant<int, std::string, double> v(1.0);
+    std::experimental::optional<double> o;
+    bool b = match<bool>(std::make_tuple(v,o),
+        [] (double, std::experimental::nullopt_t) { return true;},
+        [] (auto, auto) { return false; }
+    );
+    BOOST_TEST(b);
+  }
+  {
+    boost::variant<int, X, double> v(1.0);
+    std::experimental::optional<double> o;
+    bool b = match<bool>(std::make_tuple(v,o),
+        [] (double, std::experimental::nullopt_t) { return true;},
+        [] (...) { return false; }
+    );
+    BOOST_TEST(b);
   }
 
 #if 0
