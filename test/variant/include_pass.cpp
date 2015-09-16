@@ -29,6 +29,11 @@ struct t3
 struct t4
 {};
 
+struct function_without_state {
+  using result_type = bool;
+  bool operator ()(int) { return true;}
+};
+
 namespace yafpl
 {
   template<>
@@ -245,6 +250,23 @@ int main()
     boost::variant<int, std::string, double> v(1.0);
     std::experimental::optional<double> o;
     bool b = match<bool>(std::make_tuple(v,o),
+        [] (double, std::experimental::nullopt_t) { return true;},
+        [] (auto, auto) { return false; }
+    );
+    BOOST_TEST(b);
+  }
+  {
+    std::experimental::optional<int> o;
+    bool b = match(o,
+        function_without_state{},
+        [] (auto) -> bool { return false; }
+    );
+    BOOST_TEST(!b);
+  }
+  {
+    boost::variant<int, std::string, double> v(1.0);
+    std::experimental::optional<double> o;
+    bool b = match(std::make_tuple(v,o),function_without_state{},
         [] (double, std::experimental::nullopt_t) { return true;},
         [] (auto, auto) { return false; }
     );

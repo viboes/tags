@@ -16,6 +16,7 @@
 #include <yafpl/v1/meta/identity.hpp>
 #include <yafpl/v1/meta/id.hpp>
 #include <yafpl/v1/meta/types.hpp>
+#include <yafpl/v1/meta/void_.hpp>
 #include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
 
 #include <utility>
@@ -97,7 +98,7 @@ namespace yafpl
         void dispatch_helper(
             tuple<ODTs const&...> &&odts) const
         {
-          overload(
+          overload<R>(
               [&](auto *r)
               {
                 *r = apply(this->fct, std::move(odts));
@@ -177,21 +178,34 @@ namespace yafpl
       struct is_tuple<std::tuple<Ts...>> : std::true_type {};
     } // detail
 
-#if ! defined YAFPL_X1
     template <class R, class ST, class F1, class... Fs, typename std::enable_if<
       ! detail::is_tuple<ST>::value, int>::type = 0>
     decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
     {
-      return detail::apply_impl<R>(overload(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
+      return detail::apply_impl<R>(overload<R>(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
     }
-#else
-    template <class R, class ST, class F1, class... Fs, typename std::enable_if<
-      ! detail::is_tuple<ST>::value, int>::type = 0>
+
+    template< class, class = void >
+    struct has_result_type_member : std::false_type { };
+    template< class T >
+    struct has_result_type_member<T, meta::void_<typename T::result_type>> : std::true_type { };
+
+    template <class F, class ...Fs>
+    struct deduced_result_type {
+      using type =  typename F::result_type;
+    };
+    template <class ...Fs>
+    using deduced_result_type_t = typename deduced_result_type<Fs...>::type;
+
+    template <class ST, class F1, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value
+      && has_result_type_member<F1>::value, int>::type = 0>
     decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
     {
-      return detail::apply_impl<R>(overload(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
+      using R = deduced_result_type_t<std::decay_t<F1>, std::decay_t<Fs>...>;
+      return detail::apply_impl<R>(overload<R>(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
     }
-#endif
+
 
     template <class R, class... STs, class... Fs>
     decltype(auto) match(std::tuple<STs...> const& those, Fs &&... fcts)
@@ -199,10 +213,25 @@ namespace yafpl
       return apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
+            return detail::apply_impl<R>(overload<R>(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
           },
           those);
     }
+
+    template <class... STs, class F, class... Fs, typename std::enable_if<
+      has_result_type_member<F>::value, int>::type = 0>
+    decltype(auto) match(std::tuple<STs...> const& those, F && f, Fs &&... fs)
+    {
+      using R = deduced_result_type_t<std::decay_t<F>, std::decay_t<Fs>...>;
+      return apply(
+          [&](auto && ... args) -> decltype(auto)
+          {
+            return detail::apply_impl<R>(overload<R>(std::forward<F>(f), std::forward<Fs>(fs)...), std::forward<decltype(args)>(args)...);
+          },
+          those);
+
+    }
+
 
 
   } // version
