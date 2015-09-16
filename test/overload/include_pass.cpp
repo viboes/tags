@@ -24,6 +24,13 @@ struct X {
 struct Y {
 };
 
+
+struct function_with_state {
+  void operator ()(int arg) { invoked = true; }
+  bool invoked = false;
+};
+
+
 int nonMember( float ) {
   std::cout << "int(float)" << std::endl;
   return 42;
@@ -32,6 +39,31 @@ int nonMember( float ) {
 int main()
 {
   using namespace yafpl;
+  {
+    function_with_state foo;
+
+    BOOST_TEST(! foo.invoked);
+
+    overload(std::ref(foo),
+        [](std::string str) {
+      BOOST_TEST(false);
+    })(1);
+
+    BOOST_TEST(foo.invoked);
+
+
+  }
+  {
+    function_with_state foo;
+
+    BOOST_TEST(! foo.invoked);
+
+    overload(std::ref(foo), [](std::string str) { })("aaa");
+
+    BOOST_TEST(! foo.invoked);
+
+
+  }
   {
     auto f = overload(
         [](int )
