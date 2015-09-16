@@ -29,6 +29,9 @@ struct function_with_state {
   void operator ()(int arg) { invoked = true; }
   bool invoked = false;
 };
+struct function_without_state {
+  void operator ()(int arg) { }
+};
 
 
 int nonMember( float ) {
@@ -40,6 +43,46 @@ int main()
 {
   using namespace yafpl;
   {
+    function_without_state foo;
+
+    auto f = overload<int>(foo,  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+      return 1;
+    },
+    nonMember
+    );
+    f(1);
+
+  }
+  {
+    function_without_state foo;
+
+    auto f = overload(foo,  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+    },
+    nonMember
+    );
+    f(1);
+
+  }
+  {
+    function_without_state foo;
+
+    auto f = overload(std::move(foo),  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+    },
+    [](...)
+    {
+      std::cout << "int(...)" << std::endl;
+    }
+    );
+    f(1);
+
+  }
+  {
     function_with_state foo;
 
     BOOST_TEST(! foo.invoked);
@@ -50,8 +93,18 @@ int main()
     })(1);
 
     BOOST_TEST(foo.invoked);
+  }
+  {
+    function_with_state foo;
 
+    BOOST_TEST(! foo.invoked);
 
+    overload(foo,
+        [](std::string str) {
+      BOOST_TEST(false);
+    })(1);
+
+    BOOST_TEST(! foo.invoked);
   }
   {
     function_with_state foo;
@@ -61,8 +114,6 @@ int main()
     overload(std::ref(foo), [](std::string str) { })("aaa");
 
     BOOST_TEST(! foo.invoked);
-
-
   }
   {
     auto f = overload(
@@ -171,8 +222,7 @@ int main()
   {
     auto f = overload(
         nonMember,
-        &X::f
-        ,
+        &X::f,
         [](...)
         {
           std::cout << "int(...)" << std::endl;
@@ -187,8 +237,7 @@ int main()
   {
     auto f = overload<int>(
         nonMember,
-        &X::f
-        ,
+        &X::f,
         [](...)
         {
           std::cout << "int(...)" << std::endl;

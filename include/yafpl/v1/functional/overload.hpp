@@ -91,7 +91,8 @@ namespace yafpl
         using forwarder<F>::operator();
         using forwarder<G>::operator();
 
-        constexpr overloader(F&& f, G&& g)
+        template <class F1, class G1>
+        constexpr overloader(F1&& f, G1&& g)
         : forwarder<F>(move(f)),
           forwarder<G>(move(g))
         {}
@@ -103,7 +104,9 @@ namespace yafpl
       {
         using result_type = R;
         using overloader<F, G>::operator();
-        explicit_overloader(F&& f, G&& g) : overloader<F, G>(std::forward<F>(f), std::forward<G>(g)) {}
+
+        template <class F1, class G1>
+        explicit_overloader(F1&& f, G1&& g) : overloader<F, G>(std::forward<F>(f), std::forward<G>(g)) {}
       };
 
     } // detail
