@@ -174,65 +174,110 @@ namespace yafpl
 
       template <class T>
       struct is_tuple : std::false_type {};
+      template <class T>
+      struct is_tuple<T const> : is_tuple<T> {};
+      template <class T>
+      struct is_tuple<T volatile> : is_tuple<T> {};
+      template <class T>
+      struct is_tuple<T const volatile> : is_tuple<T> {};
       template <class ...Ts>
       struct is_tuple<std::tuple<Ts...>> : std::true_type {};
+
+      template< class, class = void >
+      struct has_result_type_member : std::false_type { };
+      template< class T >
+      struct has_result_type_member<T, meta::void_<typename T::result_type>> : std::true_type { };
+
+      template< class T1, class T2 >
+      struct and_;
+      template< class T >
+      struct and_<std::true_type, T> : T {};
+      template< class T >
+      struct and_<std::false_type, T> : std::false_type {};
+
+      template< class T >
+      struct have_result_type_member_x;
+      template< class T >
+      struct have_result_type_member_x<types<T>> : has_result_type_member<T> {};
+      template< class T1, class T2, class ...Ts >
+      struct have_result_type_member_x<types<T1, T2, Ts...>>
+        : and_<
+            has_result_type_member<T1>,
+            have_result_type_member_x<types<T2, Ts...>>
+          >
+      {};
+
+      template< class ...Ts >
+      struct have_result_type_member : have_result_type_member_x<types<Ts...>> { };
+
+      template <class F, class ...Fs>
+      struct deduced_result_type {
+        using type =  typename F::result_type;
+      };
+      template <class ...Fs>
+      using deduced_result_type_t = typename deduced_result_type<Fs...>::type;
     } // detail
 
+    // explicit result type
+    template <class R, class ST, class F1, class F2, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value, int>::type = 0>
+    decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
+    {
+#if ! defined YAFPL_X1
+      return match(id<R>{}, that, overload(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...));
+#else
+      return match(that, overload(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...));
+#endif
+    }
     template <class R, class ST, class F1, class... Fs, typename std::enable_if<
       ! detail::is_tuple<ST>::value, int>::type = 0>
-    decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
+    decltype(auto) match(ST & that, F1 && f1, Fs &&... fs)
     {
-      return detail::apply_impl<R>(overload<R>(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
+#if ! defined YAFPL_X1
+      return match(id<R>{}, that, overload(std::forward<F1>(f1), std::forward<Fs>(fs)...));
+#else
+      return match(that, overload(std::forward<F1>(f1), std::forward<Fs>(fs)...));
+#endif
     }
 
-    template< class, class = void >
-    struct has_result_type_member : std::false_type { };
-    template< class T >
-    struct has_result_type_member<T, meta::void_<typename T::result_type>> : std::true_type { };
-
-    template <class F, class ...Fs>
-    struct deduced_result_type {
-      using type =  typename F::result_type;
-    };
-    template <class ...Fs>
-    using deduced_result_type_t = typename deduced_result_type<Fs...>::type;
-
-    template <class ST, class F1, class... Fs, typename std::enable_if<
-      ! detail::is_tuple<ST>::value
-      && has_result_type_member<F1>::value, int>::type = 0>
-    decltype(auto) match(ST const& that, F1 && f1, Fs &&... fs)
-    {
-      using R = deduced_result_type_t<std::decay_t<F1>, std::decay_t<Fs>...>;
-      return detail::apply_impl<R>(overload<R>(std::forward<F1>(f1), std::forward<Fs>(fs)...), that);
-    }
-
-
+    // explicit result type on a product of sum types
     template <class R, class... STs, class... Fs>
     decltype(auto) match(std::tuple<STs...> const& those, Fs &&... fcts)
     {
       return apply(
           [&](auto && ... args) -> decltype(auto)
           {
-            return detail::apply_impl<R>(overload<R>(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
+            return detail::apply_impl<R>(overload(std::forward<Fs>(fcts)...), std::forward<decltype(args)>(args)...);
           },
           those);
     }
 
+    // result type deduced the nested typedef result_type of all functions
+    template <class ST, class F1, class F2, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value
+      && detail::have_result_type_member<F1>::value, int>::type = 0>
+    decltype(auto) match(ST const& that, F1 && f1, F2 && f2, Fs &&... fs)
+    {
+      using R = detail::deduced_result_type_t<std::decay_t<F1>, std::decay_t<F2>, std::decay_t<Fs>...>;
+      return match<R>(that, std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...);
+    }
+    template <class ST, class F1, class F2, class... Fs, typename std::enable_if<
+      ! detail::is_tuple<ST>::value
+      && detail::have_result_type_member<F1>::value, int>::type = 0>
+    decltype(auto) match(ST& that, F1 && f1, F2 && f2, Fs &&... fs)
+    {
+      using R = detail::deduced_result_type_t<std::decay_t<F1>, std::decay_t<F2>, std::decay_t<Fs>...>;
+      return match<R>(that, std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...);
+    }
+
+    // result type deduced the nested typedef result_type of all functions on a product of sum types
     template <class... STs, class F, class... Fs, typename std::enable_if<
-      has_result_type_member<F>::value, int>::type = 0>
+      detail::have_result_type_member<F>::value, int>::type = 0>
     decltype(auto) match(std::tuple<STs...> const& those, F && f, Fs &&... fs)
     {
-      using R = deduced_result_type_t<std::decay_t<F>, std::decay_t<Fs>...>;
-      return apply(
-          [&](auto && ... args) -> decltype(auto)
-          {
-            return detail::apply_impl<R>(overload<R>(std::forward<F>(f), std::forward<Fs>(fs)...), std::forward<decltype(args)>(args)...);
-          },
-          those);
-
+      using R = detail::deduced_result_type_t<std::decay_t<F>, std::decay_t<Fs>...>;
+      return match<R>(those, std::forward<F>(f), std::forward<Fs>(fs)...);
     }
-
-
 
   } // version
 } // yafpl

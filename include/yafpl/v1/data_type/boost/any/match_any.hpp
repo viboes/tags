@@ -57,14 +57,14 @@ namespace boost
     {
       T1 * res = any_cast<T1>(&x);
       if (res) return f(*res);
-      else return f();
+      else return (decltype(f(*res)))f();
     }
     template <class T1, class T2, class ...Ts, class F>
     auto match_any(any& x, yafpl::meta::types<T1, T2, Ts...>, F&& f)
     {
       T1 * res = any_cast<T1>(&x);
       if (res) return f(*res);
-      else return match_any(x, yafpl::meta::types<T2, Ts...>(), std::forward<F>(f));
+      else return (decltype(f(*res)))match_any(x, yafpl::meta::types<T2, Ts...>(), std::forward<F>(f));
     }
 
     template <class T, class ...Ts, class F1, class F2, class ...Fs>

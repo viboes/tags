@@ -54,7 +54,6 @@ namespace yafpl
 int main()
 {
   {
-    // todo: this must work.
     int a = 2;
     boost::any b = 2;
     yafpl::match<void>(std::make_tuple(a, yafpl::select<yafpl::types<int, std::string>>(b)),
