@@ -6,8 +6,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+//#define YAFPL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_INSTALLED
+
 #include <yafpl/v1/data_type/boost/variant.hpp>
+#if defined YAFPL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_INSTALLED
 #include <yafpl/v1/data_type/optional/optional.hpp>
+#endif
 #include <yafpl/v1/functional/match.hpp>
 #include <yafpl/v1/functional/tags.hpp>
 #include <yafpl/v1/functional/select.hpp>
@@ -246,6 +250,7 @@ int main()
         }
     );
   }
+#if defined YAFPL_STD_EXPERIMENTAL_FUNDAMENTALS_V2_STD_OPTIONAL_INSTALLED
   {
     boost::variant<int, std::string, double> v(1.0);
     std::experimental::optional<double> o;
@@ -281,7 +286,7 @@ int main()
     );
     BOOST_TEST(b);
   }
-
+#endif
 #if 0
   // compile fails
   {
