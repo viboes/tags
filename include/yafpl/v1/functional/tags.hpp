@@ -14,6 +14,7 @@
 #include <yafpl/v1/meta/types.hpp>
 
 #include <utility>
+#include <type_traits>
 
 namespace yafpl {
   YAFPL_INLINE_NAMESPACE(v1) {
@@ -49,7 +50,9 @@ namespace yafpl {
         tagged& operator=(tagged const&) = default;
         tagged& operator=(tagged &&) = default;
 
-        template <class T>
+        template <class T, typename std::enable_if<
+          std::is_convertible<T, Type>::value, int>::type = 0
+        >
         tagged(T && v)
         : val(std::forward<T>(v)) {}
 
