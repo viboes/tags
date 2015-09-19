@@ -24,8 +24,12 @@
 
 namespace yafpl
 {
+  template < class ...Ts >
+  struct type_list
+  {};
+
     template <class ...Types>
-    struct sum_type_alternatives<boost::variant<Types...>> : yafpl::meta::identity<yafpl::meta::types<Types...>> {};
+    struct sum_type_alternatives<boost::variant<Types...>> : yafpl::meta::identity<type_list<Types...>> {};
 };
 
 namespace boost

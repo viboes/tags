@@ -66,8 +66,8 @@ namespace yafpl
        * * the nullary void function to call when there are no more alternatives in Types,
        * * the product type of the reference to the current alternative of the sum types already visited
        */
-      template <class Final, class R, class F, class ... DTs, class ... STs>
-      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, meta::types<> >
+      template <class Final, class R, class F, class ... DTs, class ... STs, template <class...> class TMPL>
+      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<> >
       {
       public:
 
@@ -96,13 +96,13 @@ namespace yafpl
        * Defines the operator(T const&). This is the function called by match custom for ST.
        * Inherits from the applier that will define the other operator(U) for U in Ts.
        */
-      template <class Final, class R, class F, class... DTs, class... STs, class T, class... Ts>
-      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<T, Ts...>>
-      : public applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<Ts...>>
+      template <class Final, class R, class F, class... DTs, class... STs, template <class...> class TMPL, class T, class... Ts>
+      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<T, Ts...>>
+      : public applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<Ts...>>
       {
       public:
 
-        using super = applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<Ts...>>;
+        using super = applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<Ts...>>;
 
         /* Pass everything up to the base case. */
         applier(R *r, F &fct, std::tuple<DTs const&...> &&members, std::tuple<STs const&...> &&sums)
@@ -241,17 +241,17 @@ namespace yafpl
 
       template< class T >
       struct have_result_type_member_x;
-      template< class T >
-      struct have_result_type_member_x<types<T>> : has_result_type_member<T> {};
-      template< class T1, class T2, class ...Ts >
-      struct have_result_type_member_x<types<T1, T2, Ts...>>
+      template< template <class...> class TMPL, class T >
+      struct have_result_type_member_x<TMPL<T>> : has_result_type_member<T> {};
+      template< template <class...> class TMPL, class T1, class T2, class ...Ts >
+      struct have_result_type_member_x<TMPL<T1, T2, Ts...>>
         : and_<
             has_result_type_member<T1>,
-            have_result_type_member_x<types<T2, Ts...>>
+            have_result_type_member_x<TMPL<T2, Ts...>>
           >
       {};
 
-      template< class ...Ts >
+      template<class ...Ts >
       struct have_result_type_member : have_result_type_member_x<types<Ts...>> { };
 
       template <class F, class ...Fs>
