@@ -30,40 +30,28 @@ namespace yafpl
 
 namespace boost
 {
-  namespace variant_detail
-  {
-    template <class R, class V, class T1, class F>
-    R match_variant(V& x, yafpl::meta::types<T1>, F&& f)
-    {
-      T1 const& res = ::boost::get<T1>(x);
-      return f(res);
-    }
-    template <class R, class V, class T1, class T2, class ...Ts, class F>
-    R match_variant(V& x, yafpl::meta::types<T1, T2, Ts...>, F&& f)
-    {
-      T1 const * res = ::boost::get<T1>(&x);
-      if (res) return f(*res);
-      else return match_variant<R>(x, yafpl::meta::types<T2, Ts...>(), std::forward<F>(f));
-    }
-
-    template <class R, class V, class T, class ...Ts, class F1, class F2, class ...Fs>
-    R match_variant(V& x, yafpl::meta::types<T, Ts...>, F1&& f1, F2&& f2, Fs&&... fs)
-    {
-      return match_variant<R>(x, yafpl::meta::types<T, Ts...>(),
-          yafpl::overload(std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fs)...)
-      );
-    }
-  }
 
 #if ! defined YAFPL_X1
   template <class R, class ...Types, class F>
   R match(yafpl::meta::id<R>, boost::variant<Types...> const& x, F&& f)
   {
-    return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
+    //return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
+    return boost::apply_visitor(std::forward<F>(f), x);
+  }
+  template <class R, class ...Types, class F>
+  R match(yafpl::meta::id<R>, boost::variant<Types...> & x, F&& f)
+  {
+    //return variant_detail::match_variant<R>(x, yafpl::meta::types<Types...>{}, std::forward<F>(f));
+    return boost::apply_visitor(std::forward<F>(f), x);
   }
 #else
   template <class ...Types, class F>
   auto match(boost::variant<Types...> const& x, F&& f)
+  {
+    return boost::apply_visitor(std::forward<F>(f), x);
+  }
+  template <class ...Types, class F>
+  auto match(boost::variant<Types...> & x, F&& f)
   {
     return boost::apply_visitor(std::forward<F>(f), x);
   }

@@ -17,11 +17,11 @@
 #define YAFPL_V1_DATA_TYPE_OPTIONAL_OPTIONAL_HPP
 
 #include <yafpl/v1/config.hpp>
-#include <optional.hpp>
+//#include <optional.hpp>
+#include <optional>
 #include <yafpl/v1/meta/id.hpp>
 
 #include <yafpl/v1/type_class/sum_type/sum_type_alternatives.hpp>
-#include <yafpl/v1/type_class/monad/monad.hpp>
 
 #include <utility>
 
@@ -39,9 +39,25 @@ namespace std
         else
           return f(nullopt);
     }
+    template <class R, class T, class F>
+    R match(yafpl::meta::id<R>, optional<T> & x, F&& f)
+    {
+      if (x)
+          return f(*x);
+        else
+          return f(nullopt);
+    }
 #else
     template <class T, class F>
     auto match(optional<T> const& x, F&& f)
+    {
+      if (x)
+          return f(*x);
+        else
+          return f(nullopt);
+    }
+    template <class T, class F>
+    auto match(optional<T> & x, F&& f)
     {
       if (x)
           return f(*x);

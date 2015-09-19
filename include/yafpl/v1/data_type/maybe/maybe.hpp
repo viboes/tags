@@ -89,6 +89,11 @@ YAFPL_INLINE_NAMESPACE(v1)
   {
     return match(x.data, std::forward<F>(f));
   }
+  template <class T, class F>
+  auto match(maybe<T> & x, F&& f)
+  {
+    return match(x.data, std::forward<F>(f));
+  }
 #endif
 
 }
