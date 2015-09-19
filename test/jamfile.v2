@@ -26,9 +26,9 @@ project tags
       <include>$(STD_OPTIONAL) # optional.hpp file.    
 
       <link>static
-      <toolset>gcc:<cxxflags>-std=c++11
+      #<toolset>gcc:<cxxflags>-std=c++14
       <toolset>gcc:<cxxflags>-Wno-unused-local-typedefs
-      <toolset>clang:<cxxflags>-std=c++11
+      #<toolset>clang:<cxxflags>-std=c++14
       <toolset>msvc:<asynch-exceptions>on # Needed for Boost.Test
       <toolset>msvc:<warnings>all
       <toolset>msvc:<define>_SCL_SECURE_NO_WARNINGS
