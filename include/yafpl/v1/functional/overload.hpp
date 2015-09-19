@@ -22,13 +22,11 @@ namespace yafpl
 
     namespace detail
     {
-      using namespace std;
-
       template <class F>
       struct forwarder : F
       {
         using F::operator();
-        constexpr forwarder(F fct) : F(move(fct))
+        constexpr forwarder(F fct) : F(std::move(fct))
         {}
       };
 
@@ -58,7 +56,7 @@ namespace yafpl
       {
         using result_type = R;
         using F::operator();
-        constexpr explicit_forwarder(F fct) : F(move(fct))
+        constexpr explicit_forwarder(F fct) : F(std::move(fct))
         {}
       };
 
@@ -93,8 +91,8 @@ namespace yafpl
 
         template <class F1, class G1>
         constexpr overloader(F1&& f, G1&& g)
-        : forwarder<F>(move(f)),
-          forwarder<G>(move(g))
+        : forwarder<F>(std::move(f)),
+          forwarder<G>(std::move(g))
         {}
       };
 

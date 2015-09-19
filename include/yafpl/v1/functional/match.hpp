@@ -48,16 +48,32 @@ namespace yafpl
 
     namespace detail
     {
+      /**
+       * Result: The result type of the overload
+       * Functor: The nullary void function to call when there are no more alternatives in Types
+       * DataTypeTuple: the product type of the current alternative of the sum types already visited
+       * Sts: the product type of the sum types not yet visited
+       * Types: the alternatives for the ST been visited
+       *
+       * Defines the operator(T const&) for each T in Types. This is the function called by match custom for ST
+       */
       template <class Final, class Result, class Functor, class DataTypeTuple, class STs, class Types>
       class applier;
 
+      /**
+       * Stores:
+       * * where to store the result,
+       * * the nullary void function to call when there are no more alternatives in Types,
+       * * the product type of the reference to the current alternative of the sum types already visited
+       */
       template <class Final, class R, class F, class ... DTs, class ... STs>
-      class applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, meta::types<> >
+      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, meta::types<> >
       {
       public:
 
-        applier(R *r, F &fct, tuple<DTs const&...> &&members,
-        tuple<STs const&...> &&sums)
+
+        applier(R *r, F &fct, std::tuple<DTs const&...> &&members,
+            std::tuple<STs const&...> &&sums)
         : fct(fct),
           r(r),
           members(std::move(members)),
@@ -66,37 +82,48 @@ namespace yafpl
 
         F &fct;
         R *r;
-        tuple<DTs const&...> members;
-        tuple<STs const&...> sums;
+        std::tuple<DTs const&...> members;
+        std::tuple<STs const&...> sums;
 
+        // only here to make it possible in the derived class
+        // using super::operator();
         void operator()() const
         {
-          fct();
         }
       };
 
+      /**
+       * Defines the operator(T const&). This is the function called by match custom for ST.
+       * Inherits from the applier that will define the other operator(U) for U in Ts.
+       */
       template <class Final, class R, class F, class... DTs, class... STs, class T, class... Ts>
-      class applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<T, Ts...>>
-      : public applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<Ts...>>
+      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<T, Ts...>>
+      : public applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<Ts...>>
       {
       public:
 
-        using super = applier<Final, R, F, tuple<DTs const&...>, tuple<STs const&...>, types<Ts...>>;
+        using super = applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, types<Ts...>>;
+
         /* Pass everything up to the base case. */
-        applier(R *r, F &fct, tuple<DTs const&...> &&members, tuple<STs const&...> &&sums)
+        applier(R *r, F &fct, std::tuple<DTs const&...> &&members, std::tuple<STs const&...> &&sums)
           : super(r, fct, std::move(members), std::move(sums))
         {}
 
+        // make visible the other operators(U)
         using super::operator();
+
         void operator()(T const&v) const
         {
-          dispatch(index_sequence_for<DTs...>(), v, index_sequence_for<STs...>());
+          dispatch(std::index_sequence_for<DTs...>(), v, std::index_sequence_for<STs...>());
         }
 
       private:
+        /**
+         * odts: the product of all the current references
+         */
         template <class... ODTs>
         void dispatch_helper(
-            tuple<ODTs const&...> &&odts) const
+            std::tuple<ODTs const&...> &&odts) const
         {
           overload<R>(
               [&](auto *r)
@@ -110,12 +137,17 @@ namespace yafpl
           )(this->r);
         }
 
+        /**
+         * odts: the product of all the current references up to sum type ST
+         * sum, ostd... the sum types not yet visited
+         */
         template <class... ODTs, class ST, class... OSTs>
-        void dispatch_helper(tuple<ODTs const&...> &&odts, ST const& sum, OSTs const&... osts) const
+        void dispatch_helper(std::tuple<ODTs const&...> &&odts, ST const& sum, OSTs const&... osts) const
         {
-          struct applier_type : applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_type_alternatives_t<ST> >
+          // nested applier
+          struct applier_type : applier<applier_type, R, F, std::tuple<ODTs const&...>, std::tuple<OSTs const&...>, sum_type_alternatives_t<ST> >
           {
-            using super = applier<applier_type, R, F, tuple<ODTs const&...>, tuple<OSTs const&...>, sum_type_alternatives_t<ST>>;
+            using super = applier<applier_type, R, F, std::tuple<ODTs const&...>, std::tuple<OSTs const&...>, sum_type_alternatives_t<ST>>;
             using super::super;
           };
 
@@ -127,10 +159,13 @@ namespace yafpl
 #endif
         }
 
-        template <size_t... i, size_t... j, size_t... k>
-        void dispatch(index_sequence<i...>, T const& v, index_sequence<j...>) const
+        /**
+         * This function is just a helper to manage with the indexes
+         */
+        template <size_t... i, size_t... j>
+        void dispatch(std::index_sequence<i...>, T const& v, std::index_sequence<j...>) const
         {
-          dispatch_helper(std::forward_as_tuple(get<i>(this->members)..., v), get<j>(this->sums)...);
+          dispatch_helper(std::forward_as_tuple(std::get<i>(this->members)..., v), std::get<j>(this->sums)...);
         }
       };
 
@@ -153,12 +188,21 @@ namespace yafpl
         { return nullptr; }
       };
 
+      /**
+       * R: the result type
+       * F the function object
+       * ST: a sum type
+       * STs: other sum types
+       *
+       * @effect calls to the match customization point for @c ST with a function object wrapping @c f and the other sum types @c osts.
+       * This function object will end by forwarding the call to @c f with the stored alternative for each one of the @c st/@c sts.
+       */
       template <class R, class F, class ST, class... STs>
       decltype(auto) apply_impl(F &&fct, ST const& sum, STs const&... osts)
       {
-        struct applier_type : applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_type_alternatives_t<ST> >
+        struct applier_type : applier<applier_type, R, F, std::tuple<>, std::tuple<STs const&...>, sum_type_alternatives_t<ST> >
         {
-          using super = applier<applier_type, R, F, tuple<>, tuple<STs const&...>, sum_type_alternatives_t<ST> >;
+          using super = applier<applier_type, R, F, std::tuple<>, std::tuple<STs const&...>, sum_type_alternatives_t<ST> >;
           using super::super;
         };
 
