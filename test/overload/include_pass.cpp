@@ -39,8 +39,119 @@ int nonMember( float ) {
   return 42;
 }
 
+
+namespace cppljevans {
+  //Purpose:
+  //  See if can multi-inherit classes
+  //  with member function with same
+  //  name but different signature.
+  //
+  //Result:
+  //  Works.
+  //
+  //===========
+  template<int I>
+  struct udt_i
+  /**@brief
+   *  User Defined Type.
+   */
+  {
+        friend
+      std::ostream&
+    operator<<
+      ( std::ostream& os
+      , udt_i const&
+      )
+      { return os<<"udt_i<"<<I<<">";
+      }
+  };
+  template<int I>
+  struct functor_i
+  /**@brief
+   *  User Defined Functor.
+   */
+  {
+    using arg_t=udt_i<I>;
+    void operator()(arg_t const&a)
+    { std::cout<<"functor_i<"<<I<<">::operator()("<<a<<" const&).\n";
+    }
+  };
+  template<typename Functor>
+  struct forwarder
+  /**@brief
+   *  this->operator() forwards to Functor::operator()
+   */
+  {
+    Functor functor_v;
+    forwarder(Functor const& functor_a)
+      : functor_v(functor_a)
+    {}
+    using arg_t=typename Functor::arg_t;
+    void operator()(arg_t const&arg_v)
+    { functor_v(arg_v);
+    }
+  };
+  #ifdef __clang__
+  template<typename... Functors>
+  struct overloader
+  /**@brief
+   *  "Mixin" all the Functors::operator()'s
+   *  into this class.
+   */
+  : public forwarder<Functors>...
+  {
+    overloader(Functors&&... functors_a)
+    : forwarder<Functors>(functors_a)...
+    {}
+  };
+  #else
+  template<typename... Functors>
+  struct overloader
+  /**@brief
+   *  "Mixin" all the Functors::operator()'s
+   *  into this class.
+   */
+    ;
+  template<>
+  struct overloader<>
+  {
+    void operator()()
+    {
+    }
+  };
+  template<typename Functor0, typename... Functors>
+  struct overloader<Functor0, Functors...>
+  : public forwarder<Functor0>, overloader<Functors...>
+  {
+    overloader(Functor0&& functor0, Functors&&... functors_a)
+    : forwarder<Functor0>(std::forward<Functor0>(functor0))
+    , overloader<Functors...>(std::forward<Functors>(functors_a)...)
+    {}
+    using forwarder<Functor0>::operator();
+    using overloader<Functors...>::operator();
+  };
+#endif
+}
 int main()
 {
+  {
+    using namespace cppljevans;
+
+    overloader
+    < functor_i<0>
+    , functor_i<1>
+    , functor_i<2>
+    >
+  ovldr
+    ( functor_i<0>{}
+    , functor_i<1>{}
+    , functor_i<2>{}
+    )
+    ;
+  ovldr(udt_i<0>{});
+  ovldr(udt_i<1>{});
+  ovldr(udt_i<2>{});
+  }
   using namespace yafpl;
   {
     function_without_state foo;
@@ -49,8 +160,8 @@ int main()
         [](std::string str) {
       BOOST_TEST(false);
       return 1;
-    },
-    nonMember
+    }
+    //,    nonMember
     );
     f(1);
 
