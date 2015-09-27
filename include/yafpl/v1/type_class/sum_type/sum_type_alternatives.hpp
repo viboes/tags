@@ -11,6 +11,8 @@
 
 #include <yafpl/v1/config.hpp>
 
+#include <tuple>
+
 namespace yafpl
 {
 YAFPL_INLINE_NAMESPACE(v1)
@@ -20,9 +22,21 @@ YAFPL_INLINE_NAMESPACE(v1)
   struct sum_type_alternatives: meta::identity<meta::types<ST>>
   {
   };
-
   template <class ST>
   using sum_type_alternatives_t = typename sum_type_alternatives<ST>::type;
+
+  template <class ST>
+  struct sum_type_size: std::tuple_size<sum_type_alternatives_t<ST>>
+  {
+  };
+
+  template <std::size_t I, class ST>
+  struct sum_type_element: std::tuple_element<I, sum_type_alternatives_t<ST>>
+  {
+  };
+  template <std::size_t I, class ST>
+  using sum_type_element_t = typename sum_type_element<I, ST>::type;
+
 }
 }
 #endif // header

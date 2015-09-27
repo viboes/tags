@@ -57,7 +57,7 @@ namespace yafpl
        *
        * Defines the operator(T const&) for each T in Types. This is the function called by match custom for ST
        */
-      template <class Final, class Result, class Functor, class DataTypeTuple, class STs, class Types>
+      template <class Result, class Functor, class DataTypeTuple, class ST, class STs, class Ns>
       class applier;
 
       /**
@@ -66,8 +66,8 @@ namespace yafpl
        * * the nullary void function to call when there are no more alternatives in Types,
        * * the product type of the reference to the current alternative of the sum types already visited
        */
-      template <class Final, class R, class F, class ... DTs, class ... STs, template <class...> class TMPL>
-      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<> >
+      template <class R, class F, class ... DTs, class ST, class ... STs>
+      class applier<R, F, std::tuple<DTs const&...>, ST, std::tuple<STs const&...>, std::index_sequence<> >
       {
       public:
 
@@ -96,13 +96,13 @@ namespace yafpl
        * Defines the operator(T const&). This is the function called by match custom for ST.
        * Inherits from the applier that will define the other operator(U) for U in Ts.
        */
-      template <class Final, class R, class F, class... DTs, class... STs, template <class...> class TMPL, class T, class... Ts>
-      class applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<T, Ts...>>
-      : public applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<Ts...>>
+      template <class R, class F, class... DTs, class ST, class... STs, std::size_t N, size_t... Ns>
+      class applier<R, F, std::tuple<DTs const&...>, ST, std::tuple<STs const&...>, std::index_sequence<N, Ns...>>
+      : public applier<R, F, std::tuple<DTs const&...>, ST, std::tuple<STs const&...>, std::index_sequence<Ns...>>
       {
       public:
-
-        using super = applier<Final, R, F, std::tuple<DTs const&...>, std::tuple<STs const&...>, TMPL<Ts...>>;
+        using T = sum_type_element_t<N, ST>;
+        using super = applier<R, F, std::tuple<DTs const&...>, ST, std::tuple<STs const&...>, std::index_sequence<Ns...>>;
 
         /* Pass everything up to the base case. */
         applier(R *r, F &fct, std::tuple<DTs const&...> &&members, std::tuple<STs const&...> &&sums)
@@ -141,15 +141,12 @@ namespace yafpl
          * odts: the product of all the current references up to sum type ST
          * sum, ostd... the sum types not yet visited
          */
-        template <class... ODTs, class ST, class... OSTs>
-        void dispatch_helper(std::tuple<ODTs const&...> &&odts, ST const& sum, OSTs const&... osts) const
+        template <class... ODTs, class OST, class... OSTs>
+        void dispatch_helper(std::tuple<ODTs const&...> &&odts, OST const& sum, OSTs const&... osts) const
         {
           // nested applier
-          struct applier_type : applier<applier_type, R, F, std::tuple<ODTs const&...>, std::tuple<OSTs const&...>, sum_type_alternatives_t<ST> >
-          {
-            using super = applier<applier_type, R, F, std::tuple<ODTs const&...>, std::tuple<OSTs const&...>, sum_type_alternatives_t<ST>>;
-            using super::super;
-          };
+          using applier_type = applier<R, F, std::tuple<ODTs const&...>, OST, std::tuple<OSTs const&...>,
+              std::make_integer_sequence<std::size_t,sum_type_size<OST>::value >>;
 
           // customization point
 #if ! defined YAFPL_X1
@@ -200,11 +197,8 @@ namespace yafpl
       template <class R, class F, class ST, class... STs>
       decltype(auto) apply_impl(F &&fct, ST const& sum, STs const&... osts)
       {
-        struct applier_type : applier<applier_type, R, F, std::tuple<>, std::tuple<STs const&...>, sum_type_alternatives_t<ST> >
-        {
-          using super = applier<applier_type, R, F, std::tuple<>, std::tuple<STs const&...>, sum_type_alternatives_t<ST> >;
-          using super::super;
-        };
+        using applier_type = applier<R, F, std::tuple<>, ST, std::tuple<STs const&...>,
+            std::make_integer_sequence<std::size_t, sum_type_size<ST>::value> >;
 
         storage<R> r;
         // customization point

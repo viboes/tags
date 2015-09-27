@@ -24,13 +24,43 @@
 
 namespace yafpl
 {
-  template < class ...Ts >
-  struct type_list
-  {};
+    template < class ...Ts >
+    struct type_list
+    {};
 
+    // just to show that we can use another template for enumerating the alternatives.
     template <class ...Types>
     struct sum_type_alternatives<boost::variant<Types...>> : yafpl::meta::identity<type_list<Types...>> {};
 };
+
+namespace std
+{
+  template < class ...Types >
+  struct tuple_size<yafpl::type_list<Types...>>
+  : public integral_constant<size_t, sizeof...(Types)> { };
+
+  template <size_t I>
+  class tuple_element<I, yafpl::type_list<> >
+  {
+  public:
+      static_assert(I == 0, "tuple_element index out of range");
+      static_assert(I != 0, "tuple_element index out of range");
+  };
+
+  template <class T, class ...Ts>
+  class tuple_element<0, yafpl::type_list<T, Ts...> >
+  {
+  public:
+      typedef T type;
+  };
+
+  template <size_t I, class T, class ...Ts>
+  class tuple_element<I, yafpl::type_list<T, Ts...> >
+  {
+  public:
+      typedef typename tuple_element<I-1, yafpl::type_list<Ts...> >::type type;
+  };
+}
 
 namespace boost
 {
