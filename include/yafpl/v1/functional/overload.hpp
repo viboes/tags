@@ -117,7 +117,7 @@ namespace yafpl
         using overloader<Fs...>::operator();
 
         template <class ...OFs>
-        explicit_overloader(OFs&& ...fs) : overloader<Fs...>(std::forward<OFs>(fs)...) {}
+        constexpr explicit_overloader(OFs&& ...fs) : overloader<Fs...>(std::forward<OFs>(fs)...) {}
       };
 
     } // detail
@@ -129,20 +129,20 @@ namespace yafpl
     }
 
     template <class F1, class F2, class ... Fs>
-    auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
+    constexpr auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
     {
       return detail::overloader<std::decay_t<F1>,std::decay_t<F2>, std::decay_t<Fs>...>(
           std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fcts)...);
     }
 
     template <class R, class F>
-    auto overload(F && f)
+    constexpr auto overload(F && f)
     {
       return detail::explicit_forwarder<R, F>(std::forward<F>(f));
     }
 
     template <class R, class F1, class F2, class ... Fs>
-    auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
+    constexpr auto overload(F1 && f1, F2 && f2, Fs &&... fcts)
     {
       return detail::explicit_overloader<R, std::decay_t<F1>,std::decay_t<F2>, std::decay_t<Fs>...>(
           std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Fs>(fcts)...);

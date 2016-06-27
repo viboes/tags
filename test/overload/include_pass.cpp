@@ -30,9 +30,15 @@ struct function_with_state {
   bool invoked = false;
 };
 struct function_without_state {
-  void operator ()(int arg) { }
+  constexpr void operator ()(int arg) const noexcept { }
 };
 
+struct function_without_state2 {
+  constexpr int operator ()(int arg) const noexcept { return arg;}
+};
+struct function_without_state3 {
+  int operator ()(int arg) const noexcept { return arg;}
+};
 
 int nonMember( float ) {
   std::cout << "int(float)" << std::endl;
@@ -153,6 +159,17 @@ int main()
   ovldr(udt_i<2>{});
   }
   using namespace yafpl;
+//  {
+//    auto f = overload(
+//        [](int i, double d) {},
+//        [](std::string str, int i) {
+//        },
+//        [](double d, int i) {
+//          BOOST_TEST(false);
+//        }
+//    );
+//    f(1,1); // ambiguous call compalie fails
+//  }
   {
     function_without_state foo;
 
@@ -359,6 +376,54 @@ int main()
     X x;
     BOOST_TEST(f(x, 'c') == x);
     BOOST_TEST_EQ(f(Y{}), -1);
+  }
+  {
+    constexpr auto f = overload(function_without_state{},
+        [](std::string str) {
+      return 1;
+    }
+    //,    nonMember
+    );
+    f(1);
+
+  }
+  {
+    constexpr auto f = overload(function_without_state2{},
+        [](std::string str) {
+      return 1;
+    }
+    //,    nonMember
+    );
+    constexpr auto x = f(1);
+    static_assert(1 == x, "");
+
+  }
+  {
+    constexpr auto f = overload(function_without_state3{},
+        [](std::string str) {
+      return 1;
+    }
+    //,    nonMember
+    );
+#if 0
+    constexpr auto x = f(1); // COMPILE ERROR as expected
+    //overload/include_pass.cpp:409:25: erreur: call to non-constexpr function ‘int function_without_state3::operator()(int) const’
+    //     constexpr auto x = f(1);
+    static_assert(1 == x, "");
+#endif
+    auto y = f(1);
+    assert(1 == y);
+
+  }
+  {
+    constexpr auto f = overload<int>(function_without_state2{},
+        [](std::string str) {
+      return 1;
+    }
+    //,    nonMember
+    );
+    f(1);
+
   }
   return boost::report_errors();
 }
