@@ -32,7 +32,12 @@ struct function_with_state {
 struct function_without_state {
   constexpr void operator ()(int arg) const noexcept { }
 };
-
+struct function_without_state_x {
+  constexpr void operator ()(float arg) const noexcept { }
+};
+struct function_without_state_throw {
+  void operator ()(int arg) const { throw 1;}
+};
 struct function_without_state2 {
   constexpr int operator ()(int arg) const noexcept { return arg;}
 };
@@ -40,9 +45,34 @@ struct function_without_state3 {
   int operator ()(int arg) const noexcept { return arg;}
 };
 
+struct function_with_rvalue_ref_q {
+  void operator ()(int arg) && { }
+};
+struct function_with_lvalue_ref_q {
+  void operator ()(int arg) & { }
+};
+struct function_with_no_ref_q {
+  void operator ()(int arg) { }
+};
+struct function_with_ref_q {
+  int operator ()(int arg) & { return 1; }
+  int operator ()(int arg) && { return 2; }
+};
+
+struct function_with_cv_q {
+  int operator ()(int arg) { return 0; }
+  int operator ()(int arg) const { return 1; }
+  int operator ()(int arg) volatile { return 2; }
+  int operator ()(int arg) const volatile { return 3; }
+};
+
+
 int nonMember( float ) {
   std::cout << "int(float)" << std::endl;
   return 42;
+}
+int nonMember_throw( float ) {
+  throw 1;;
 }
 
 
@@ -223,6 +253,12 @@ int main()
     BOOST_TEST(foo.invoked);
   }
   {
+    overload(function_with_state{},
+        [](std::string str) {
+      BOOST_TEST(false);
+    })(1);
+  }
+  {
     function_with_state foo;
 
     BOOST_TEST(! foo.invoked);
@@ -382,8 +418,9 @@ int main()
         [](std::string str) {
       return 1;
     }
-    //,    nonMember
+    ,    nonMember
     );
+    static_assert(noexcept(f(1)), "");
     f(1);
 
   }
@@ -392,19 +429,21 @@ int main()
         [](std::string str) {
       return 1;
     }
-    //,    nonMember
     );
     constexpr auto x = f(1);
     static_assert(1 == x, "");
 
   }
   {
+    static_assert(noexcept(function_without_state3{}(1)), "");
+
     constexpr auto f = overload(function_without_state3{},
-        [](std::string str) {
+        [](std::string str) noexcept {
       return 1;
     }
-    //,    nonMember
     );
+    static_assert(noexcept(f(1)), "");
+    static_assert(noexcept(f(std::string())), "");
 #if 0
     constexpr auto x = f(1); // COMPILE ERROR as expected
     //overload/include_pass.cpp:409:25: erreur: call to non-constexpr function ‘int function_without_state3::operator()(int) const’
@@ -416,14 +455,85 @@ int main()
 
   }
   {
+
+    static_assert(! noexcept(nonMember_throw(1.0)), "");
+    constexpr auto f = overload(nonMember_throw);
+    static_assert(! noexcept(f(1.0)), "");
+
+  }
+  {
     constexpr auto f = overload<int>(function_without_state2{},
         [](std::string str) {
       return 1;
     }
-    //,    nonMember
     );
     f(1);
 
+  }
+  { // overload noexcept
+    static_assert(noexcept(overload(function_without_state{},function_without_state_x{})), "");
+    auto f = overload(function_without_state{},function_without_state_x{});
+    f(1);
+  }
+  {
+    static_assert(noexcept(overload(nonMember)), "");
+
+    constexpr auto f = overload(nonMember,
+        [](std::string str) noexcept {
+      return 1;
+    }
+    );
+    auto y = f(1.0);
+    assert(42 == y);
+
+  }
+  {
+    auto f = overload(function_with_no_ref_q{});
+    f(1);
+  }
+  {
+    auto f = overload(function_with_lvalue_ref_q{});
+    f(1);
+  }
+  {
+    auto f = overload(function_with_rvalue_ref_q{});
+    (void)f;
+    //f(1);
+    //overload/include_pass.cpp:495:8: erreur: no match for call to ‘(function_without_rvalue_ref_q) (int)’
+  }
+  {
+    overload(function_with_rvalue_ref_q{})(1);
+  }
+  {
+    auto f = overload(function_with_ref_q{});
+    assert(1 ==f(1));
+  }
+  {
+    assert(2 == overload(function_with_ref_q{})(1));
+  }
+
+  {
+    auto f = overload(function_with_cv_q{});
+    assert(0 ==f(1));
+  }
+  {
+    const auto f = overload(function_with_cv_q{});
+    assert(1 ==f(1));
+  }
+  {
+    volatile auto f = overload(function_with_cv_q{});
+    assert(2 ==f(1));
+  }
+  {
+    const volatile auto f = overload(function_with_cv_q{});
+    assert(3 ==f(1));
+  }
+  {
+    constexpr auto f = overload(function_with_cv_q{});
+    assert(1 ==f(1));
+  }
+  {
+    assert(0 ==overload(function_with_cv_q{})(1));
   }
   return boost::report_errors();
 }
