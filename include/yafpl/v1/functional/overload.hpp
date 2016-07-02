@@ -123,7 +123,7 @@ namespace yafpl
     } // detail
 
     template <class F>
-    auto overload(F && f)
+    constexpr auto overload(F && f) noexcept(noexcept(std::forward<F>(f)))
     {
       return std::forward<F>(f);
     }
@@ -136,7 +136,7 @@ namespace yafpl
     }
 
     template <class R, class F>
-    constexpr auto overload(F && f)
+    constexpr auto overload(F && f) noexcept(noexcept( detail::explicit_forwarder<R, F>(std::forward<F>(f)) ))
     {
       return detail::explicit_forwarder<R, F>(std::forward<F>(f));
     }
