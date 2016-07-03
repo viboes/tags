@@ -80,7 +80,10 @@ namespace yafpl {
         : val(&v) {}
 
         value_type& value() { return *val; }
-        value_type const& value() const { return *val; }
+        //value_type const& value() const { return *val; }
+        //../include/yafpl/v1/functional/tags.hpp:83:20: warning: 'const' qualifier on reference type 'value_type' (aka 'Type &') has no effect [-Wignored-qualifiers]
+        //        value_type const& value() const { return *val; }
+
 
     private:
         Type* val;
