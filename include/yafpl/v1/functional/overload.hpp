@@ -37,7 +37,21 @@ namespace yafpl
 
           constexpr forwarder(type f) : f(f) { }
 
-          constexpr R operator () (X &&... x) const {
+          constexpr R operator () (X &&... x) const noexcept(noexcept( f(std::forward<X>(x)...) ))
+          {
+              return f(std::forward<X>(x)...);
+          }
+      };
+
+      template< class R, class ...X >
+      struct forwarder<R(&)(X...)> {
+          using type = R(&)(X...);
+          type f;
+
+          constexpr forwarder(type f) : f(f) { }
+
+          constexpr R operator () (X &&... x) const noexcept(noexcept( f(std::forward<X>(x)...) ))
+          {
               return f(std::forward<X>(x)...);
           }
       };
@@ -61,9 +75,21 @@ namespace yafpl
       };
 
       template< class R, class ...X >
-      struct explicit_forwarder<R, R(X...)> {
+      struct explicit_forwarder<R, R(*)(X...)> {
           using result_type = R;
           using type = R(*)(X...);
+          type f;
+
+          constexpr explicit_forwarder(type f) : f(f) { }
+
+          constexpr R operator () (X &&... x) const {
+              return f(std::forward<X>(x)...);
+          }
+      };
+      template< class R, class ...X >
+      struct explicit_forwarder<R, R(&)(X...)> {
+          using result_type = R;
+          using type = R(&)(X...);
           type f;
 
           constexpr explicit_forwarder(type f) : f(f) { }
@@ -123,9 +149,10 @@ namespace yafpl
     } // detail
 
     template <class F>
-    constexpr auto overload(F && f) noexcept(noexcept(std::forward<F>(f)))
+    constexpr auto overload(F && f) noexcept(noexcept( detail::forwarder<F>(std::forward<F>(f)) ))
     {
-      return std::forward<F>(f);
+      return detail::forwarder<F>(std::forward<F>(f));
+
     }
 
     template <class F1, class F2, class ... Fs>

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cassert>
 
 #include <boost/detail/lightweight_test.hpp>
 
@@ -18,6 +19,9 @@ struct X {
   X& f(char) {
     std::cout << "X::f" << std::endl;
     return *this;
+  }
+  int g(char) {
+    return 33;
   }
   bool operator==(X const&) { return true; }
 };
@@ -385,39 +389,95 @@ int main()
   }
   {
     auto f = overload(
-        nonMember,
-        &X::f,
-        [](...)
+        nonMember
+#if defined __GNUC__ and ! defined __clang__
+        , &X::f
+#endif
+        , [](...)
         {
           std::cout << "int(...)" << std::endl;
           return -1;
         }
     );
     BOOST_TEST(f(1.0) == 42);
+#if defined __GNUC__ and ! defined __clang__
     X x;
     BOOST_TEST(f(x, 'c') == x);
+#endif
     BOOST_TEST_EQ(f(Y{}), -1);
+  }
+  {
+    auto f = overload<X&>(
+         &X::f
+    );
+    X x;
+    BOOST_TEST(f(x, 'c') == x);
   }
   {
     auto f = overload<int>(
-        nonMember,
-        &X::f,
-        [](...)
+         &X::g
+    );
+    X x;
+    BOOST_TEST(f(x, 'c') == 33);
+  }
+  {
+    auto f = overload(
+         &X::g
+    );
+    X x;
+    BOOST_TEST(f(x, 'c') == 33);
+  }
+  {
+    auto f1 = overload(
+        nonMember
+    );
+    BOOST_TEST(f1(1.0) == 42);
+  }
+  {
+    auto f1 = overload<int>(
+        &nonMember
+    );
+    BOOST_TEST(f1(1.0) == 42);
+  }
+  {
+    auto f1 = overload(
+        //overload/include_pass.cpp:429:12: error: attempt to use a deleted function
+        &nonMember
+        , &X::g
+    );
+    X x;
+    BOOST_TEST(f1(x, 'c') == 33);
+#if defined __GNUC__ and ! defined __clang__
+    BOOST_TEST(f1(1.0) == 42);
+#endif
+  }
+  {
+    auto f = overload<int>(
+        nonMember
+        //overload/include_pass.cpp:429:12: error: attempt to use a deleted function
+        , &X::g
+        , [](...)
         {
           std::cout << "int(...)" << std::endl;
           return -1;
         }
     );
+#if defined __GNUC__ and ! defined __clang__
     BOOST_TEST(f(1.0) == 42);
+#endif
     X x;
-    BOOST_TEST(f(x, 'c') == x);
-    BOOST_TEST_EQ(f(Y{}), -1);
+    BOOST_TEST(f(x, 'c') == 33);
+#if defined __GNUC__ and ! defined __clang__
+    BOOST_TEST(f(Y{})== -1);
+#endif
   }
   {
-    constexpr auto f = overload(function_without_state{},
-        [](std::string str) {
+    constexpr auto f = overload(function_without_state{}
+#if defined __GNUC__ and ! defined __clang__
+        , [](std::string str) {
       return 1;
     }
+#endif
     ,    nonMember
     );
     static_assert(noexcept(f(1)), "");
@@ -425,10 +485,12 @@ int main()
 
   }
   {
-    constexpr auto f = overload(function_without_state2{},
-        [](std::string str) {
+    constexpr auto f = overload(function_without_state2{}
+#if defined __GNUC__ and ! defined __clang__
+        , [](std::string str) {
       return 1;
     }
+#endif
     );
     constexpr auto x = f(1);
     static_assert(1 == x, "");
@@ -437,13 +499,8 @@ int main()
   {
     static_assert(noexcept(function_without_state3{}(1)), "");
 
-    constexpr auto f = overload(function_without_state3{},
-        [](std::string str) noexcept {
-      return 1;
-    }
-    );
+    constexpr auto f = overload(function_without_state3{});
     static_assert(noexcept(f(1)), "");
-    static_assert(noexcept(f(std::string())), "");
 #if 0
     constexpr auto x = f(1); // COMPILE ERROR as expected
     //overload/include_pass.cpp:409:25: erreur: call to non-constexpr function ‘int function_without_state3::operator()(int) const’
@@ -457,28 +514,35 @@ int main()
   {
 
     static_assert(! noexcept(nonMember_throw(1.0)), "");
-    constexpr auto f = overload(nonMember_throw);
+    constexpr auto f = overload(&nonMember_throw);
     static_assert(! noexcept(f(1.0)), "");
 
   }
   {
-    constexpr auto f = overload<int>(function_without_state2{},
-        [](std::string str) {
+    //overload/include_pass.cpp:468:9: note: non-literal type '(lambda at overload/include_pass.cpp:468:9)' cannot be used in a constant expression
+    constexpr auto f = overload<int>(function_without_state2{}
+#if defined __GNUC__ and ! defined __clang__
+        , [](std::string str) {
       return 1;
     }
+#endif
     );
     f(1);
 
   }
   { // overload noexcept
+#if defined __GNUC__ and ! defined __clang__
     static_assert(noexcept(overload(function_without_state{},function_without_state_x{})), "");
+#endif
     auto f = overload(function_without_state{},function_without_state_x{});
     f(1);
   }
   {
+#if defined __GNUC__ and ! defined __clang__
     static_assert(noexcept(overload(nonMember)), "");
+#endif
 
-    constexpr auto f = overload(nonMember,
+    auto f = overload(nonMember,
         [](std::string str) noexcept {
       return 1;
     }
@@ -487,6 +551,7 @@ int main()
     assert(42 == y);
 
   }
+
   {
     auto f = overload(function_with_no_ref_q{});
     f(1);
