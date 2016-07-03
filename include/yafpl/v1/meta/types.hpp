@@ -30,7 +30,7 @@ YAFPL_INLINE_NAMESPACE(v1)
 namespace std
 {
   template < class ...Types >
-  struct tuple_size<yafpl::meta::types<Types...>>
+  class tuple_size<yafpl::meta::types<Types...>>
   : public integral_constant<size_t, sizeof...(Types)> { };
 
   template <size_t I>
