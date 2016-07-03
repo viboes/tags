@@ -89,6 +89,11 @@ YAFPL_INLINE_NAMESPACE(v1)
     //!
     //! ### Example
     //! @include example/monad/bind.cpp
+
+
+    //    ../include/yafpl/v1/type_class/monad/monad.hpp:92:27: error: constexpr variable 'bind' must be initialized by a constant expression
+    //        constexpr auto bind = [](auto&& m, auto&& f) -> decltype(auto) {
+    #if defined __GNUC__ and ! defined __clang__
     constexpr auto bind = [](auto&& m, auto&& f) -> decltype(auto) {
         return Monad::instance<
             datatype_t<decltype(m)>
@@ -97,6 +102,7 @@ YAFPL_INLINE_NAMESPACE(v1)
             std::forward<decltype(f)>(f)
         );
     };
+#endif
   }
 }
 }
