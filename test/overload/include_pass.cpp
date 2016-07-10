@@ -36,6 +36,7 @@ struct final_function_object_non_const final {
   void operator ()(int arg) { }
 };
 
+
 struct function_with_state {
   void operator ()(int arg) { invoked = true; }
   bool invoked = false;
@@ -46,6 +47,12 @@ struct function_without_state {
 struct function_without_state_x {
   constexpr void operator ()(float arg) const noexcept { }
 };
+struct convertible_to_function_object {
+  operator function_without_state() const {
+    return function_without_state{};
+  }
+};
+
 struct function_without_state_throw {
   void operator ()(int arg) const { throw 1;}
 };
@@ -209,9 +216,8 @@ int main()
 //          BOOST_TEST(false);
 //        }
 //    );
-//    f(1,1); // ambiguous call compalie fails
+//    f(1,1); // ambiguous call compile fails
 //  }
-#if 1
   {
     final_function_object_const foo;
 
@@ -227,19 +233,14 @@ int main()
       BOOST_TEST(false);
       return 1;
     }
-    //,    nonMember
     );
     f(1);
 
   }
-#endif
-#if 1
   {
     final_function_object_const foo;
 
-    auto f = overload<int>(foo
-    //,    nonMember
-    );
+    auto f = overload<int>(foo);
     f(1);
 
   }
@@ -251,8 +252,19 @@ int main()
       BOOST_TEST(false);
       return 1;
     }
-    //,    nonMember
     );
+    f(1);
+
+  }
+#if 0
+  //../include/yafpl/v1/functional/overload.hpp:29:18: error: no member named 'operator()' in 'convertible_to_function_object'
+  //        using F::operator();
+                ~~~^
+
+  {
+    convertible_to_function_object foo;
+
+    auto f = overload<int>(foo);
     f(1);
 
   }
