@@ -22,7 +22,7 @@ namespace yafpl
 
     namespace detail
     {
-      template <class F, bool IsFinal=std::is_final<F>::value>
+      template <class F, bool IsFinal=std::is_class<F>::value && std::is_final<F>::value>
       struct forwarder : F
       {
         using type = F;
@@ -62,8 +62,8 @@ namespace yafpl
               return f(std::forward<Xs>(xs)...);
           }
       };
-      template< class R, class ...X, bool b >
-      struct forwarder<R(*)(X...), b> {
+      template< class R, class ...X>
+      struct forwarder<R(*)(X...), false> {
           using type = R(*)(X...);
           type f;
 
@@ -75,8 +75,8 @@ namespace yafpl
           }
       };
 
-      template< class R, class ...X, bool b >
-      struct forwarder<R(&)(X...), b> {
+      template< class R, class ...X >
+      struct forwarder<R(&)(X...), false> {
           using type = R(&)(X...);
           type f;
 
@@ -88,9 +88,9 @@ namespace yafpl
           }
       };
 
-      template<class R, class O, class...X, bool b>
-      struct forwarder<R(O::*)(X...), b> : forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), b> {
-        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), b>;
+      template<class R, class O, class...X>
+      struct forwarder<R(O::*)(X...), false> : forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), false> {
+        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), false>;
         using type = R(O::*)(X...);
 
         constexpr forwarder(type f) : base(std::mem_fn(f)) { }
