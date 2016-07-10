@@ -22,16 +22,48 @@ namespace yafpl
 
     namespace detail
     {
-      template <class F>
+      template <class F, bool IsFinal=std::is_final<F>::value>
       struct forwarder : F
       {
+        using type = F;
         using F::operator();
         constexpr forwarder(F fct) : F(std::move(fct))
         {}
       };
+      template< class F>
+      struct forwarder<F, true> {
+          using type = F;
+          type f;
 
-      template< class R, class ...X >
-      struct forwarder<R(*)(X...)> {
+          constexpr forwarder(type fct) : f(fct) { }
+
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) const volatile
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) const
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) volatile
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs)
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+      };
+      template< class R, class ...X, bool b >
+      struct forwarder<R(*)(X...), b> {
           using type = R(*)(X...);
           type f;
 
@@ -43,8 +75,8 @@ namespace yafpl
           }
       };
 
-      template< class R, class ...X >
-      struct forwarder<R(&)(X...)> {
+      template< class R, class ...X, bool b >
+      struct forwarder<R(&)(X...), b> {
           using type = R(&)(X...);
           type f;
 
@@ -56,9 +88,9 @@ namespace yafpl
           }
       };
 
-      template<class R, class O, class...X>
-      struct forwarder<R(O::*)(X...)> : forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))> {
-        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))>;
+      template<class R, class O, class...X, bool b>
+      struct forwarder<R(O::*)(X...), b> : forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), b> {
+        using base = forwarder<decltype(std::mem_fn(std::declval<R(O::*)(X...)>())), b>;
         using type = R(O::*)(X...);
 
         constexpr forwarder(type f) : base(std::mem_fn(f)) { }
@@ -66,46 +98,12 @@ namespace yafpl
       };
 
       template <class R, class F>
-      struct explicit_forwarder : F
+      struct explicit_forwarder : forwarder<F>
       {
         using result_type = R;
-        using F::operator();
-        constexpr explicit_forwarder(F fct) : F(std::move(fct))
+        using forwarder<F>::operator();
+        constexpr explicit_forwarder(F fct) : forwarder<F>(std::move(fct))
         {}
-      };
-
-      template< class R, class ...X >
-      struct explicit_forwarder<R, R(*)(X...)> {
-          using result_type = R;
-          using type = R(*)(X...);
-          type f;
-
-          constexpr explicit_forwarder(type f) : f(f) { }
-
-          constexpr R operator () (X &&... x) const {
-              return f(std::forward<X>(x)...);
-          }
-      };
-      template< class R, class ...X >
-      struct explicit_forwarder<R, R(&)(X...)> {
-          using result_type = R;
-          using type = R(&)(X...);
-          type f;
-
-          constexpr explicit_forwarder(type f) : f(f) { }
-
-          constexpr R operator () (X &&... x) const {
-              return f(std::forward<X>(x)...);
-          }
-      };
-
-      template<class R, class O, class...X>
-      struct explicit_forwarder<R, R(O::*)(X...)> : explicit_forwarder<R, decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))> {
-        using base = explicit_forwarder<R,decltype(std::mem_fn(std::declval<R(O::*)(X...)>()))>;
-        using type = R(O::*)(X...);
-
-        constexpr explicit_forwarder(type f) : base(std::mem_fn(f)) { }
-        using base::operator();
       };
 
       template <class F, class ...Fs>
@@ -149,9 +147,9 @@ namespace yafpl
     } // detail
 
     template <class F>
-    constexpr auto overload(F && f) noexcept(noexcept( detail::forwarder<F>(std::forward<F>(f)) ))
+    constexpr auto overload(F && f) noexcept(noexcept( detail::forwarder<std::decay_t<F>>(std::forward<F>(f)) ))
     {
-      return detail::forwarder<F>(std::forward<F>(f));
+      return detail::forwarder<std::decay_t<F>>(std::forward<F>(f));
 
     }
 
@@ -163,9 +161,9 @@ namespace yafpl
     }
 
     template <class R, class F>
-    constexpr auto overload(F && f) noexcept(noexcept( detail::explicit_forwarder<R, F>(std::forward<F>(f)) ))
+    constexpr auto overload(F && f) noexcept(noexcept( detail::explicit_forwarder<R, std::decay_t<F>>(std::forward<F>(f)) ))
     {
-      return detail::explicit_forwarder<R, F>(std::forward<F>(f));
+      return detail::explicit_forwarder<R, std::decay_t<F>>(std::forward<F>(f));
     }
 
     template <class R, class F1, class F2, class ... Fs>

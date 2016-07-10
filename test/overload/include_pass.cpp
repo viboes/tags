@@ -28,6 +28,13 @@ struct X {
 struct Y {
 };
 
+struct final_function_object_const final {
+  void operator ()(int arg) const { }
+};
+
+struct final_function_object_non_const final {
+  void operator ()(int arg) { }
+};
 
 struct function_with_state {
   void operator ()(int arg) { invoked = true; }
@@ -204,6 +211,52 @@ int main()
 //    );
 //    f(1,1); // ambiguous call compalie fails
 //  }
+#if 1
+  {
+    final_function_object_const foo;
+
+    auto f = overload(foo);
+    f(1);
+
+  }
+  {
+    final_function_object_non_const foo;
+
+    auto f = overload(foo,  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+      return 1;
+    }
+    //,    nonMember
+    );
+    f(1);
+
+  }
+#endif
+#if 1
+  {
+    final_function_object_const foo;
+
+    auto f = overload<int>(foo
+    //,    nonMember
+    );
+    f(1);
+
+  }
+  {
+    final_function_object_non_const foo;
+
+    auto f = overload<int>(foo,  // foo should be copied
+        [](std::string str) {
+      BOOST_TEST(false);
+      return 1;
+    }
+    //,    nonMember
+    );
+    f(1);
+
+  }
+#endif
   {
     function_without_state foo;
 
