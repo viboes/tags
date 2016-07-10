@@ -36,7 +36,7 @@ namespace yafpl
 namespace std
 {
   template < class ...Types >
-  struct tuple_size<yafpl::type_list<Types...>>
+  class tuple_size<yafpl::type_list<Types...>>
   : public integral_constant<size_t, sizeof...(Types)> { };
 
   template <size_t I>
