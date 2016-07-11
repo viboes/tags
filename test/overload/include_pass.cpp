@@ -64,7 +64,16 @@ struct function_without_state3 {
 };
 
 struct function_with_rvalue_ref_q {
-  void operator ()(int arg) && { }
+  int operator ()(int arg) && { return 1; }
+  int operator ()(int arg) const && { return 2; }
+  int operator ()(int arg) & { return 3;}
+  int operator ()(int arg) const & { return 4;}
+};
+struct final_function_with_rvalue_ref_q final {
+  int operator ()(int arg) && { return 1; }
+  int operator ()(int arg) const && { return 2; }
+  int operator ()(int arg) & { return 3;}
+  int operator ()(int arg) const & { return 4;}
 };
 struct function_with_lvalue_ref_q {
   void operator ()(int arg) & { }
@@ -255,6 +264,16 @@ int main()
     );
     f(1);
 
+  }
+  {
+    final_function_object_non_const foo;
+
+    overload<int>(foo,
+        [](std::string str) {
+      BOOST_TEST(false);
+      return 1;
+    }
+    )(1);
   }
 #if 0
   //../include/yafpl/v1/functional/overload.hpp:29:18: error: no member named 'operator()' in 'convertible_to_function_object'
@@ -573,7 +592,7 @@ int main()
     static_assert(1 == x, "");
 #endif
     auto y = f(1);
-    assert(1 == y);
+    BOOST_TEST(1 == y);
 
   }
   {
@@ -613,7 +632,7 @@ int main()
     }
     );
     auto y = f(1.0);
-    assert(42 == y);
+    BOOST_TEST(42 == y);
 
   }
 
@@ -626,44 +645,55 @@ int main()
     f(1);
   }
   {
+    BOOST_TEST(1 ==function_with_rvalue_ref_q{}(1));
+
+    BOOST_TEST(1 ==detail::wrap_call<function_with_rvalue_ref_q>(function_with_rvalue_ref_q{})(1));
+
     auto f = overload(function_with_rvalue_ref_q{});
-    (void)f;
-    //f(1);
-    //overload/include_pass.cpp:495:8: erreur: no match for call to ‘(function_without_rvalue_ref_q) (int)’
+    BOOST_TEST_EQ(3, f(1));
+
   }
   {
-    overload(function_with_rvalue_ref_q{})(1);
+    BOOST_TEST(1 ==overload(function_with_rvalue_ref_q{})(1));
   }
   {
     auto f = overload(function_with_ref_q{});
-    assert(1 ==f(1));
+    BOOST_TEST(1 ==f(1));
   }
   {
-    assert(2 == overload(function_with_ref_q{})(1));
+    detail::wrap_call<final_function_with_rvalue_ref_q>(final_function_with_rvalue_ref_q{})(1);
+    BOOST_TEST(1 ==overload(final_function_with_rvalue_ref_q{})(1));
+  }
+  {
+    auto f = overload(final_function_with_rvalue_ref_q{});
+    BOOST_TEST(3 ==f(1));
+  }
+  {
+    BOOST_TEST(2 == overload(function_with_ref_q{})(1));
   }
 
   {
     auto f = overload(function_with_cv_q{});
-    assert(0 ==f(1));
+    BOOST_TEST(0 ==f(1));
   }
   {
     const auto f = overload(function_with_cv_q{});
-    assert(1 ==f(1));
+    BOOST_TEST(1 ==f(1));
   }
   {
     volatile auto f = overload(function_with_cv_q{});
-    assert(2 ==f(1));
+    BOOST_TEST(2 ==f(1));
   }
   {
     const volatile auto f = overload(function_with_cv_q{});
-    assert(3 ==f(1));
+    BOOST_TEST(3 ==f(1));
   }
   {
     constexpr auto f = overload(function_with_cv_q{});
-    assert(1 ==f(1));
+    BOOST_TEST(1 ==f(1));
   }
   {
-    assert(0 ==overload(function_with_cv_q{})(1));
+    BOOST_TEST(0 ==overload(function_with_cv_q{})(1));
   }
   return boost::report_errors();
 }

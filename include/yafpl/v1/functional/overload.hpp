@@ -31,37 +31,104 @@ namespace yafpl
         {}
       };
       template< class F>
-      struct forwarder<F, true> {
+      struct wrap_call {
           using type = F;
           type f;
 
-          constexpr forwarder(type fct) : f(fct) { }
+          template<typename G,
+                   /* Make sure that it does not act as copy constructor for wrap_call& */
+                   std::enable_if_t<!std::is_base_of<wrap_call, std::decay_t<G>>::value
+                   /* require that F can be constructed from U&& */
+                   && std::is_constructible<F, G>::value, bool> = true>
+          constexpr wrap_call(G&& fct) : f(std::forward<G>(fct)) { }
 
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const volatile
+          constexpr auto operator () (Xs &&... xs) const &
             noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
           {
               return f(std::forward<Xs>(xs)...);
           }
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) const
+          constexpr auto operator () (Xs &&... xs) const &&
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
+          {
+              return std::move(f)(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) &
             noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
           {
               return f(std::forward<Xs>(xs)...);
           }
           template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs) volatile
-            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+          constexpr auto operator () (Xs &&... xs) &&
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
           {
-              return f(std::forward<Xs>(xs)...);
-          }
-          template< class ...Xs >
-          constexpr auto operator () (Xs &&... xs)
-            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
-          {
-              return f(std::forward<Xs>(xs)...);
+              return std::move(f)(std::forward<Xs>(xs)...);
           }
       };
+      template< class F>
+      struct forwarder<F, true>
+#if 0
+
+      : wrap_call<F>
+      {
+        template<typename G,
+                 /* Make sure that it does not act as copy constructor for wrap_call& */
+                 std::enable_if_t<!std::is_base_of<forwarder, std::decay_t<G>>::value
+                 /* require that F can be constructed from U&& */
+                 && std::is_constructible<F, G>::value, bool> = true>
+        constexpr forwarder(G&& fct) : wrap_call<F>(std::forward<G>(fct)) { }
+      };
+#else
+      {
+          using type = F;
+          type f;
+
+          template<typename G,
+                   /* Make sure that it does not act as copy constructor for wrap_call& */
+                   std::enable_if_t<!std::is_base_of<forwarder, std::decay_t<G>>::value
+                   /* require that F can be constructed from U&& */
+                   && std::is_constructible<F, G>::value, bool> = true>
+          constexpr forwarder(G&& fct) : f(std::forward<G>(fct)) { }
+
+          //template <class FF>
+          //constexpr forwarder(FF&& fct) : f(std::move(fct)) { }
+
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) const &
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) const &&
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
+          {
+              return std::move(f)(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) &
+            noexcept(noexcept( f(std::forward<Xs>(xs)...) ))
+            -> decltype(f(std::forward<Xs>(xs)...))
+          {
+              return f(std::forward<Xs>(xs)...);
+          }
+          template< class ...Xs >
+          constexpr auto operator () (Xs &&... xs) &&
+            noexcept(noexcept( std::move(f)(std::forward<Xs>(xs)...) ))
+            -> decltype(std::move(f)(std::forward<Xs>(xs)...))
+          {
+              return std::move(f)(std::forward<Xs>(xs)...);
+          }
+      };
+#endif
       template< class R, class ...X>
       struct forwarder<R(*)(X...), false> {
           using type = R(*)(X...);
